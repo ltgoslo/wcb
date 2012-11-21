@@ -1,0 +1,69 @@
+name	action	start	end	seperator	parameters
+		See mwlib/parser/nodes.py and mwlib/advtree.py for node names
+		action is either:
+		a) purge: remove tag and content
+		b) keep: keep both tag and content
+		c) replace: replace tag and content with a token
+		d) remove tag, but keep its content
+Section	keep	⌊=¦	¦=⌋	¦	level
+Article	keep	<___⌊document¦	¦document⌋___>
+Source	purge	
+Code	keep	<___⌊ƒ¦	¦ƒ⌋___> 
+BreakingReturn	purge	
+HorizontalRule	purge	
+Index	purge	
+Teletyped	keep	⌊t¦	¦t⌋
+Reference	purge	
+ReferenceList	purge	
+Gallery	purge	
+Center	remove	
+Div	keep	⌊p¦	¦p⌋
+Span	remove	
+Font	remove	
+Strike	keep	⌊-¦	¦-⌋
+ImageMap	purge	
+Ruby	remove	
+RubyBase	remove	
+RubyText	purge	
+RubyParantheses	purge	
+Deleted	keep	⌊-¦	¦-⌋
+Inserted	keep	⌊_¦	¦_⌋
+Caption	purge	
+Table	purge	
+Row	purge	
+Cell	purge	
+Abbreviation	keep	⌊.¦	¦.⌋	¦	title
+Math	keep	<___⌊ƒ¦	¦ƒ⌋___>
+DefinitionList	keep
+Item	keep	⌊#¦	¦#⌋
+ItemList	keep	⌊•¦	¦•⌋
+DefinitionTerm	keep	⌊:¦	¦:⌋
+DefinitionDescription	keep	⌊⇥¦	¦⇥⌋
+Heading	keep	⌊=¦	¦=⌋	level
+TimeLine	purge
+Italic	keep	⌊/¦	¦/⌋
+Bold	keep	⌊*¦	¦*⌋
+Strong	keep	⌊*¦	¦*⌋
+Blockquote	keep	⌊"¦	¦"⌋
+Underline	keep	⌊_¦	¦_⌋
+Overline	keep	⌊-¦	¦-⌋
+Sub	keep	⌊,¦	¦,⌋
+Sup	keep	⌊^¦	¦^⌋
+Small	keep	⌊↓¦	¦↓⌋
+Big	keep	⌊↑¦	¦↑⌋
+Cite	keep	⌊'¦	¦'⌋
+Var	keep	⌊ƒ¦	¦ƒ⌋
+Preformatted	keep	⌊pre¦	¦pre⌋
+Poem	keep	⌊pre¦	¦pre⌋
+Comment	purge
+URL	keep	⌊>¦	¦>⌋
+ArticleLink	keep	⌊>¦	¦>⌋	
+InterwikiLink	keep	⌊>¦	¦>⌋
+CategoryLink	purge	
+ImageLink	replace	⌊img⌋
+LangLink	purge	
+NamedURL	keep	⌊>¦	¦>⌋
+NameSpaceLink	keep	⌊>¦	¦>⌋
+Paragraph	keep	⌊p¦	¦p⌋
+Emphasized	keep	⌊/¦	¦/⌋
+Hieroglyphs	purge	

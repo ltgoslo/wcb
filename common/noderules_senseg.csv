@@ -1,0 +1,68 @@
+name	action	comment
+				See mwlib/parser/nodes.py and mwlib/advtree.py for node names
+				action is either:
+				a) purge: remove tag and content
+				b) keep: keep both tag and content
+				c) replace: replace tag and content with a token
+				d) remove tag, but keep its content
+Article	remove	
+Section	remove	
+Source	purge	
+Code	remove	
+BreakingReturn	purge	
+HorizontalRule	remove	
+Index	remove	
+Teletyped	remove	
+Reference	purge	
+ReferenceList	purge	
+Gallery	purge	
+Center	remove	
+Div	remove	
+Span	remove	
+Font	remove	
+Strike	remove	
+ImageMap	purge	
+Ruby	remove	
+RubyBase	remove	
+RubyText	remove	
+RubyParantheses	purge	
+Deleted	remove	
+Inserted	remove	
+Caption	purge	
+Table	purge	
+Row	purge	
+Cell	purge	
+Abbreviation	remove	
+Math	remove	
+DefinitionList	remove	
+Item	remove	
+ItemList	remove	
+DefinitionTerm	remove	
+DefinitionDescription	remove	
+TimeLine	purge	
+Italic	remove	
+Bold	remove	
+Strong	remove	
+Blockquote	remove	
+Underline	remove	
+Overline	remove	
+Sub	remove	
+Sup	remove	
+Small	remove	
+Big	remove	
+Cite	remove	
+Var	remove	
+Preformatted	remove	
+Poem	remove	
+Comment	purge	
+URL	remove	
+ArticleLink	remove	
+InterwikiLink	remove	
+CategoryLink	purge	
+ImageLink	purge	
+LangLink	purge	
+NamedURL	remove	
+NameSpaceLink	remove	
+Paragraph	remove	
+Emphasized	remove	
+Hieroglyphs	purge	
