@@ -1,22 +1,15 @@
-wikiconf = ../wikiconf.txt
+#path to the wikiconf created by "mw-buildcdb"
+wikiconf = PATH/TO/wikiconf.txt
+
+sections = sections.csv
 templaterules = templaterules.csv
-templatecache = ../cache/cachedrules.csv
-templaterules_cc = templaterules_corpusclean.csv
-templatecache_cc = ../cache/cachedrules_corpusclean.csv
-noderules = noderules.csv
-noderules_cc = noderules_corpusclean.csv
-noderules_senseg = noderules_senseg.csv
-noderules_gml = noderules_gml.csv
-sections = exp/sections.csv
-clean lm = ../sets3g/lm/clean_4gram_50train_addsmooth_1.lm
-dirty lm = ../sets3g/lm/dirty_4gram_50train_addsmooth_1.lm
-tmp = ../cache
-sets = sets
-#senseg
-corenlp_cp = /ltg/jread/workspace/senseg/bin/corenlp/bin:/ltg/jread/workspace/senseg/bin/corenlp/lib/*
-mxterminator_cp = /ltg/jread/workspace/senseg/bin/jmx/mxpost.jar
-mxterminator_project = /ltg/jread/workspace/senseg/bin/jmx/eos.project
-rasp = /ltg/jread/workspace/senseg/bin/rasp3os/sentence/sentence.x86_64_linux
-splitta = /ltg/larsjsol/splitta/sbd.py
-opennlp = /ltg/larsjsol/apache-opennlp-1.5.2-incubating/bin/opennlp
-opennlp_sent = /ltg/larsjsol/apache-opennlp-1.5.2-incubating/en-sent.bin
+tmp = tmp
+templatecache = tmp/templaterules.csv
+
+clean lm = clean.lm.gz
+dirty lm = dirty.lm.gz
+
+#it should not be necessary to change anything below
+noderules = ../common/noderules.csv
+noderules_senseg = ../common/noderules_senseg.csv
+noderules_gml = ../common/noderules_gml.csv
