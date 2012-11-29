@@ -10,7 +10,6 @@ import argparse, multiprocessing, collections, Queue
 import os, codecs, traceback, re, gzip, signal
 import gml, senseg, classify, paths, util, srilm
 import log, util, list_articles, template, node, purify
-import wikiwoods
 from mwlib import wiki, advtree
 
 class TimeoutException(Exception):
@@ -138,12 +137,12 @@ def worker(outdir, inqueue, outqueue,
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--article-list')
     parser.add_argument('out_dir')
-    parser.add_argument('--clean-port', default='5000')
-    parser.add_argument('--dirty-port', default='5001')
-    parser.add_argument('--processes', '-p', default=1, type=int)
-    parser.add_argument('--blacklist')
+    parser.add_argument('--article-list', '-a', help='only include the articles listed in this file')
+    parser.add_argument('--clean-port', '-c', default='5000', help='which port should the "clean" model bind to (default: 5000)')
+    parser.add_argument('--dirty-port', '-d', default='5001', help='which port should the "dirty" model bind to (default: 5001)')
+    parser.add_argument('--processes', '-p', default=1, type=int, help="run this many processes in parallel (default: 1)")
+    parser.add_argument('--blacklist', '-b', help="do not include the articles listed in this file")
     args = parser.parse_args()
 
 
