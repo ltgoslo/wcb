@@ -40,26 +40,6 @@ def write_segment(outdir, entries):
         e[2] = None
     _seg_id += 1
                         
-
-def filter_sections(sections):
-    sprint = 0
-    for s in reversed(sections):
-        if s.isEmpty():
-            s.clean = False
-            s.sprint = False
-        else:
-            s.sprint = s.clean
-
-        if s.clean:
-            sprint = s.level
-        elif s.level < sprint:
-            s.sprint = True
-
-        if isinstance(s, advtree.Article):
-            if sprint:
-                s.sprint = True
-            sprint = 0
-
 def worker(outdir, inqueue, outqueue,
            order, clean_port, dirty_port, 
            prerocessor, gml_purifier, senseg_purifier):
@@ -79,7 +59,7 @@ def worker(outdir, inqueue, outqueue,
             #get 100 entries
             entries = collections.deque([])
             i = 0
-            try:
+            try: 
                 while i < 100:
                     entry = inqueue.get(True, 1)
                     entries.append(entry)
@@ -95,7 +75,7 @@ def worker(outdir, inqueue, outqueue,
             for e in entries:
                 e[2] = u''
                 for sect in e[3]:
-                    filter_sections(e[3])
+                    gml.filter_sections(e[3])
 
                     text = senseg.senseg(senseg_purifier.node2str(sect.tree))
                     lines = purify.markup_sentences(gml_purifier, sect, re.split('\n+', text), gml.escape)

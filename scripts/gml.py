@@ -6,9 +6,9 @@
 # Lars J|rgen Solberg <larsjsol@sh.titan.uio.no> 2012
 #
 import util, log, purify, template, classify
-import node, paths, senseg, build_corpus
+import node, paths, senseg
 import argparse, collections, re
-from mwlib import wiki
+from mwlib import wiki, advtree 
 
 re_empty = re.compile(ur'⌊(.+?)¦[ \t\r\f\v]*¦\1⌋', re.U)
 
@@ -63,6 +63,27 @@ re_magicchars = re.compile(u'([⌊⌋¦])', re.U)
 def escape(text):
     return re_magicchars.sub(u'⌊\1⌋', text)
 
+
+def filter_sections(sections):
+    sprint = 0
+    for s in reversed(sections):
+        if s.isEmpty():
+            s.clean = False
+            s.sprint = False
+        else:
+            s.sprint = s.clean
+
+        if s.clean:
+            sprint = s.level
+        elif s.level < sprint:
+            s.sprint = True
+
+        if isinstance(s, advtree.Article):
+            if sprint:
+                s.sprint = True
+            sprint = 0
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('article')
@@ -78,7 +99,7 @@ if __name__ == "__main__":
     preprocessor = classify.Preprocessor(env, act, node.read_rules(paths.paths["noderules"]))
     sections = preprocessor.parse_and_purify(args.article)
     clean,dirty = classify.classify(sections, clean_port=args.clean_port, dirty_port=args.dirty_port)
-    build_corpus.filter_sections(sections)
+    filter_sections(sections)
 
     log.logger.debug('clean sections: ' + ', '.join([s.title for s in clean]))
     log.logger.debug('dirty sections: ' + ', '.join([s.title for s in dirty]))

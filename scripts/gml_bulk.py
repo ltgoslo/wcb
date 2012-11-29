@@ -20,25 +20,6 @@ def write_results(outdir, string, num):
         util.s2file(string, name)
 
 
-def filter_sections(sections):
-    lvl = 6
-    sprint = False
-    for s in reversed(sections):
-        if s.isEmpty():
-            s.clean = False
-            s.sprint = False
-        s.sprint = s.clean
-
-
-        if s.level < lvl:
-            s.sprint = sprint
-        if s.level > lvl:
-            sprint = s.sprint
-        else: 
-            sprint = s.sprint or sprint
-        lvl = s.level
-    return sections
-    #return [s for s in sections if s.clean]
 
 def worker(outdir, inqueue, outqueue,
            order, clean_port, dirty_port, 
@@ -81,8 +62,8 @@ def worker(outdir, inqueue, outqueue,
                     sections.extend(preprocessor.parse_and_purify(name))
                 
             classify.classify(sections, clean_client, dirty_client)    
-        
-            sections = filter_sections(sections)
+         
+            sections = gml.filter_sections(sections)
             for sect in sections:
                 if sect.clean or sect.sprint:
                     text = senseg.senseg(senseg_purifier.node2str(sect.tree))
