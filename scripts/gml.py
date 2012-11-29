@@ -32,12 +32,12 @@ def postprocess(text):
  
 
     res = text
-    i = True
-    while i:
-        res, i = arrows.sub(arrow, res)
+    n = True
+    while n:
+        res, n = arrows.subn(arrow, res)
 
-    n = 1
-    while n > 0:
+    n = True
+    while n:
         res,n = re_empty.subn('', res)
     
 
@@ -92,9 +92,6 @@ if __name__ == "__main__":
         senseg_purifier = purify.Purifier(env, act, node.read_rules(paths.paths["noderules_senseg"]))
         senseg_purifier.extra_newlines = True
 
-        for s in sections:
-            print s.sprint
-            print s.clean
         for s in senseg.senseg_sections(senseg_purifier, gml_purifier, clean, escape):
             print fix_templates(s)
     else:
