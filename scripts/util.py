@@ -6,10 +6,18 @@
 # Lars J|rgen Solberg <larsjsol@sh.titan.uio.no> 2012
 #
 
-from mwlib import nuwiki
+from mwlib import nuwiki, wiki
 import codecs, re, shlex, subprocess
 import srilm, log, paths, os, glob
 
+
+#cdb is no longer supported by mwlib, we use the third party module mwlib.cdb instead
+def wiki_nucdb(path=None, lang="en", **kwargs):
+    from mwlib.cdb import cdbwiki
+    path = os.path.expanduser(path)
+    db=cdbwiki.WikiDB(path, lang=lang)
+    return nuwiki.adapt(db)
+wiki.dispatch = dict(wiki=dict(nucdb=wiki_nucdb))
 
 def normalize_and_get_image_path(x, *args):
     pass
