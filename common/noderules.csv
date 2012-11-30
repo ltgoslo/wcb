@@ -32,7 +32,7 @@ Caption	purge
 Table	purge	
 Row	purge	
 Cell	purge	
-Abbreviation			keep	the title attribute is also kept
+Abbreviation	keep
 Math	replace	
 DefinitionList	keep	
 Item	keep	

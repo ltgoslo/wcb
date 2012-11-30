@@ -34,7 +34,7 @@ Row	purge
 Cell	purge	
 Abbreviation	keep	⌊.¦	¦.⌋	¦	title
 Math	keep	<___⌊ƒ¦	¦ƒ⌋___>
-DefinitionList	keep
+DefinitionList	remove
 Item	keep	⌊#¦	¦#⌋
 ItemList	keep	⌊•¦	¦•⌋
 DefinitionTerm	keep	⌊:¦	¦:⌋
