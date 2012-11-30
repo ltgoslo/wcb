@@ -3,7 +3,7 @@
 #
 #  $Id$
 #
-# Lars J|rgen Solberg <larsjsol@sh.titan.uio.no> 2012
+# Lars Jørgen Solberg <larsjsol@hamfast.ifi.uio.no> 2012
 #
 
 import argparse, multiprocessing, collections, Queue
@@ -38,6 +38,19 @@ def write_segment(outdir, entries):
             _art_id += 1
         e[2] = None
     _seg_id += 1
+
+
+re_article_tag = re.compile(r'</?article>', re.U)
+def readfile_wm(filename):
+    with codecs.open(filename, 'r', 'utf-8') as f:
+        title = re_article_tag.sub('', f.readline().strip())
+        content = u''
+        line = f.readline()
+        while line:
+            content += line
+            line = f.readline()
+    return content, title
+            
                         
 def worker(outdir, inqueue, outqueue,
            order, clean_port, dirty_port, 
@@ -67,7 +80,8 @@ def worker(outdir, inqueue, outqueue,
                 done = True
             sections = collections.deque([])
             for e in entries:
-                e[3] = preprocessor.parse_and_purify(e[1])
+                content, title = readfile_wm(e[1])
+                e[3] = preprocessor.purify_string(content, title)
                 sections.extend(e[3])
             classify.classify(sections, clean_client, dirty_client)
 
@@ -116,41 +130,22 @@ def worker(outdir, inqueue, outqueue,
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument('article_list')
     parser.add_argument('out_dir')
-    parser.add_argument('--article-list', '-a', help='only include the articles listed in this file')
     parser.add_argument('--clean-port', '-c', default='5000', help='which port should the "clean" model bind to (default: 5000)')
     parser.add_argument('--dirty-port', '-d', default='5001', help='which port should the "dirty" model bind to (default: 5001)')
     parser.add_argument('--processes', '-p', default=1, type=int, help="run this many processes in parallel (default: 1)")
-    parser.add_argument('--blacklist', '-b', help="do not include the articles listed in this file")
     args = parser.parse_args()
 
 
-
-    blacklist = []
-    if args.blacklist:
-        for line in util.file2s(args.blacklist).splitlines():
-            line = line.strip()
-            if line:
-                blacklist.append(line)
-
-    #read the articles
-    if args.article_list:
-        names = []
-        with codecs.open(args.article_list, 'r', 'utf-8') as f:
-            for name in f:
-                names.append(name.strip())
-        names.sort()
-        entries = [make_entry(n) for n in names if not n in blacklist]
-    else:
-        names = list_articles.articles()
-        names.sort()
-        entries = [make_entry(n) for n in names if not n in blacklist]
     names = multiprocessing.Queue()
 
-    #entries = list(entries)
-    #entries.sort(key=lambda e:e.name)
-    for e in entries:
-        names.put(e)
+    entries = []
+    with codecs.open(args.article_list, 'r', 'utf-8') as f:
+        for line in f:
+            e = make_entry(line.strip())
+            names.put(e)
+            entries.append(e)
 
     env = wiki.makewiki(paths.paths["wikiconf"])
     act = template.create_actions(env, paths.paths["templaterules"], paths.paths["templatecache"])
@@ -215,3 +210,4 @@ if __name__ == "__main__":
         write_segment(args.out_dir, entries[saved:])
     clean.stop()
     dirty.stop()
+
