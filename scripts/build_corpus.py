@@ -16,7 +16,6 @@ class TimeoutException(Exception):
     pass
 
 _nextid = 0
-
 def make_entry(name):
     global _nextid
     e = [_nextid, name, None, []]

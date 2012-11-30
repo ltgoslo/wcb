@@ -165,5 +165,3 @@ if __name__ == "__main__":
     
     r = read_rules(args.rulesfile)
     print r
-    #for k in r.actions.keys():
-    #    print k + "->" + action_name(r[k])
