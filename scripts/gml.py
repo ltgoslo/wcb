@@ -77,6 +77,7 @@ def filter_sections(sections):
             sprint = s.level
         elif s.level < sprint:
             s.sprint = True
+            sprint = s.level
 
         if isinstance(s, advtree.Article):
             if sprint:
@@ -113,6 +114,13 @@ if __name__ == "__main__":
         senseg_purifier = purify.Purifier(env, act, node.read_rules(paths.paths["noderules_senseg"]))
         senseg_purifier.extra_newlines = True
 
+        #for s in sections:
+        #    print s.title
+        #    print s.level
+        #    print s.clean
+        #    print s.sprint
+        #    print 
+            
         for s in senseg.senseg_sections(senseg_purifier, gml_purifier, clean, escape):
             print fix_templates(s)
     else:
