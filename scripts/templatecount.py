@@ -18,6 +18,7 @@ from mwlib.templ.marks import mark_start, mark_end
 import codecs, re, argparse, sys, time, unicodedata
 import traceback
 
+import util, paths
 
 class TemplateNotFound(Exception):
     pass
@@ -169,21 +170,14 @@ class Summary:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Counts template inclusions')
-    parser.add_argument('wikiconf')
     parser.add_argument('article', nargs='?', default=None)
     parser.add_argument('--outfile', '-o', default=None, type=str)
-    parser.add_argument('--all', '-a', action='store_true')
     parser.add_argument('--max', '-m', default=0, type=int, 
                         help="don't examine more than MAX articles.")
     parser.add_argument('--all-namespaces', action='store_true', help="count inclusions from all namespaces (except Template:)")
     args =  parser.parse_args()
 
-    env = wiki.makewiki(args.wikiconf)
-    #err.. It seems like NuWiki.normalize_and_get_image_path returns None
-    #when it cant find the image x.
-    #I have no idea how to create a functional NuWiki object...
-    env.wiki.normalize_and_get_image_path = lambda x: None
-
+    env = wiki.makewiki(paths.paths["wikiconf"])
     exp=Expander('', wikidb=env.wiki)
 
 
@@ -192,7 +186,7 @@ if __name__ == "__main__":
         templates = get_templates(args.article)
 
 #all articles
-    elif args.all:
+    else:
         templates = dict()
         counter = 0
 
@@ -210,7 +204,7 @@ if __name__ == "__main__":
             page = env.wiki.get_page(title)
             if not page:
                 Summary.errors += 1
-                sys.stderr.write(title.encode("utf-8", "ignore") + ': Does not seem to exist\n')
+                sys.stderr.write(title.encode("utf-8", "ignore") + ': Broken redirect\n')
                 continue
             if len(page.names) != 1:
                 Summary.redirects += 1

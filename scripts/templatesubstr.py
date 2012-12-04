@@ -6,7 +6,6 @@
 # Lars J|rgen Solberg <larsjsol@sh.titan.uio.no> 2012
 #
 
-import suffix_tree
 import argparse, csv, time, codecs, re
 
 #subtract this from the template id to get its position in rows
@@ -49,7 +48,7 @@ def printres(l):
     """
     out = open(args.outfile, 'w')
     for i in l:
-        out.write(str(i[0]) + '_' + i[1] + '_' + ', '.join([rows[x - 103][1] for x in i[2]]) + '\n')
+        out.write(str(i[0]) + '_' + i[1] + '_' + ', '.join([rows[x - R_OFFSET][1] for x in i[2]]) + '\n')
 
     out.close()
 
@@ -99,37 +98,33 @@ def complements(l):
     return res
 
 
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Most frequenty used substrings in template names")
+    parser.add_argument('templatelist', help="list of template inclusions, created with templatecount.py")
+    parser.add_argument('outfile')
+    parser.add_argument('--skip', help="ignore the SKIP most used templates", type=int, default=0)
+    args = parser.parse_args()
+    
+    #read template-list
+    rows = []
+    f = open(args.templatelist, 'rb')
+    reader = csv.reader(f, delimiter='_', quoting=csv.QUOTE_NONE)
 
-parser = argparse.ArgumentParser(description="Most frequent substrings in \
-template names factored by inclusions")
-parser.add_argument('templatelist', help="list of template inclusions, created \
-with templatecount.py")
-parser.add_argument('--word', '-w', action='store_true', 
-                    help="examine substring based on word bounderies")
-parser.add_argument('outfile')
-args = parser.parse_args()
+    reader.next() #2496177 articles
+    reader.next() #direct_total_name
+    #skip the next SKIP rows
+    for i in range(0, args.skip):
+        reader.next()
 
+    for r in reader:
+        #we only need direct inclusions and names
+        rows.append([int(r[0]), r[2]])
+    f.close()
 
-#read template-list
-rows = []
-f = open(args.templatelist, 'rb')
-reader = csv.reader(f, delimiter='_', quoting=csv.QUOTE_NONE)
+    res = {}
+    l = list()
 
-reader.next() #2496177 articles
-reader.next() #direct_total_name
-#skip the next hundred rows
-for i in range(0, 100):
-    reader.next()
-
-for r in reader:
-    #we only need direct inclusions and names
-    rows.append([int(r[0]), r[2]])
-f.close()
-
-res = {}
-l = list()
-
-if args.word:
+    R_OFFSET = args.skip + 3
     id = R_OFFSET
     for t in rows:
         strings = re.split(r'[^a-zA-Z0-9_^$]+', "^" + t[1].lower() + "$")
@@ -153,32 +148,8 @@ if args.word:
     #make each set disjunkt
     l = complements(l)
 
-
-else:
-#insert all names in to a suffix tree
-    tree = suffix_tree.GeneralisedSuffixTree()
-    tree.nextid = 103 # so the ids match the line numbers
-    tree.short = 4    # dont bother with substring shorter than 4 charachters
-    i = 0
-    for r in rows:
-        tree.add("^" + str(r[1]).lower())
-        i += 1
-        if i % 1000 == 0:
-            print time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime()) + ": " + str(i) + " strings added"
-
-    print "Examining tree"
-    checknode(tree.root, res, "")
     
-    #create a list with count, substring, matching templates
-    for k in res.keys():
-        l.append([count(res[k]), k, res[k]])
-    #sort it
     l.sort(key=lambda x: x[0], reverse=True)
-    l = collapse(l)
-    l = complements(l)
-
-    
-l.sort(key=lambda x: x[0], reverse=True)
-print "Saving results"
-printres(l)
-print "Done"
+    print "Saving results"
+    printres(l)
+    print "Done"
