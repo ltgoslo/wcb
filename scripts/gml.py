@@ -120,9 +120,9 @@ if __name__ == "__main__":
         #    print s.clean
         #    print s.sprint
         #    print 
-            
+        #FIXME does not check for empty sections    
         for s in senseg.senseg_sections(senseg_purifier, gml_purifier, clean, escape):
-            print fix_templates(s)
+            print fix_templates(s).encode('utf-8')
     else:
         for s in clean:
-            print fix_templates(gml_purifier.node2str(s.tree))
+            print fix_templates(gml_purifier.node2str(s.tree)).encode('utf-8')
