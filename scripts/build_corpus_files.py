@@ -67,7 +67,7 @@ def worker(outdir, inqueue, outqueue,
     done = False
     while not done:
         try:
-            signal.alarm(3600) #somethimes the workers freeze up...
+            #signal.alarm(3600) #somethimes the workers freeze up...
             #get 100 entries
             entries = collections.deque([])
             i = 0
