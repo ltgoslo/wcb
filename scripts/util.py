@@ -23,6 +23,18 @@ def normalize_and_get_image_path(x, *args):
     pass
 nuwiki.adapt.normalize_and_get_image_path = normalize_and_get_image_path
 
+#use the siteinfo.json from paths.txt if present
+def load_siteinfo(lang="en"):
+    from mwlib import siteinfo
+    try:
+        import simplejson as json
+    except ImportError:
+        import json
+
+    if "siteinfo" in paths.paths and os.path.exists(paths.paths["siteinfo"]):
+        siteinfo._cache[lang] = json.load(open(paths.paths["siteinfo"], "rb"))["query"]
+load_siteinfo()
+
 
 def s2file(string, path):
     """writes string to the file path"""

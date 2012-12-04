@@ -7,7 +7,7 @@
 #
 
 from mwlib import wiki, nshandling
-import paths, log
+import paths, log, util
 import argparse, random, os, codecs
 
 
@@ -52,4 +52,4 @@ if __name__ == "__main__":
         random.shuffle(names)
 
     for n in names[:args.number]:
-        print n
+        print n.encode('utf-8')
