@@ -5,7 +5,7 @@
 from mwlib import wiki, parser
 import argparse
 import codecs
-import log, paths
+import log, paths, util
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -14,9 +14,7 @@ if __name__ == "__main__":
 
     env = wiki.makewiki(paths.paths["wikiconf"])
 
-    log.logger.debug(str(args.article.__class__))
     args.article = unicode(args.article, 'utf-8')
-    log.logger.debug(str(args.article.__class__))
     
 
     if env:
