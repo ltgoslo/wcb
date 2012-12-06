@@ -15,8 +15,8 @@ if __name__ == "__main__":
     parser.add_argument('clean_set')
     parser.add_argument('dirty_set')
     parser.add_argument('lm_dir')
-    parser.add_argument('clean_port')
-    parser.add_argument('dirty_port')
+    parser.add_argument('--clean-port', default='5000')
+    parser.add_argument('--dirty-port', default='5001')
     parser.add_argument('--articles', '-a', action='store_true', default=False)
     
     args = parser.parse_args()
