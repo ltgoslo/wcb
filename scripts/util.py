@@ -114,11 +114,8 @@ def split(seq, n):
     return [seq[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in xrange(n)]
 
 
-def classifiers(lm_dir=None):
+def classifiers(lm_dir):
     """returns a list of tuples in the form (label, clean_lm, dirty_lm, order)"""
-
-    if not lm_dir:
-        lm_dir = os.path.join(paths.paths['tmp'], 'lm') 
 
     classifiers = []    
     order = re.compile(r'_(\d+)gram_')
