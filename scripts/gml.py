@@ -79,7 +79,7 @@ def filter_sections(sections):
             s.sprint = True
             sprint = s.level
 
-        if isinstance(s, advtree.Article):
+        if isinstance(s.tree, advtree.Article):
             if sprint:
                 s.sprint = True
             sprint = 0
