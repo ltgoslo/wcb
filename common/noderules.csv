@@ -6,7 +6,7 @@ name	action	start	end	comment
 				c) replace: replace tag and content with a token
 				d) remove tag, but keep its content
 Section	keep	
-Article	keep	
+Article	keep	<h1>	</h1>	
 Source	purge	
 Code	replace	
 BreakingReturn	keep	

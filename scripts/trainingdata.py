@@ -8,10 +8,10 @@
 import argparse, os, csv, random, shutil, codecs, sys, re
 import multiprocessing, logging, Queue, time, traceback
 from mwlib import wiki, nshandling, advtree
-import paths, purify, template, node, util, srilm, log
+import paths, classify, template, node, util, srilm, log
 import list_articles
 
-DEBUG = True
+DEBUG = log.DEBUG
     
         
 def isclean(section):
@@ -31,44 +31,13 @@ def isclean(section):
 
     return True
 
-def is_altclean(section):
-    # * the heading must be used less than fifty times
-    # * have no lists
-    if isdirty(section) or isclean(section):
-        return False
-
-    heading = section.heading.replace('_', '-').replace('\n', ' ')
-    if not heading in _sects:
-        return False
-
-    lists = section.tree.getChildNodesByClass(advtree.DefinitionList) + section.tree.getChildNodesByClass(advtree.ItemList)
-    if len(lists) != 0:
-        return False
-
-    return  _sects[heading][0] < 50
-
-def is_altdirty(section):
-    # * more than 75% must be taken up by lists
-    if isdirty(section) or isclean(section):
-        return False
-
-    listlen = 0
-    for l in section.tree.getChildNodesByClass(advtree.DefinitionList) + section.tree.getChildNodesByClass(advtree.ItemList):
-        listlen += len(section.purifier._node2str(l))
-
-    return float(listlen) / len(section.content) >= 0.75
-
 
 
 def isdirty(section):
-    #to be considered dirty a section either:
-    # * have one of these headings
-    #   - Deaths
-    #   - Births
-    #   - Publications
-    # * have less than 750 characters in its body and its heading must be used more than 500 times 
-    # * and it must not have one of these headings
-
+    #to be considered dirty a section:
+    # * must have less than 750 characters in its body and its heading must be used more than 5000 times
+    # * or _dirty["heading"]  == True
+    
     heading = section.heading.replace('_', '-').replace('\n', ' ')
 
     if section.title in _dirty:
@@ -104,19 +73,14 @@ _dirty = {
 
 def write_section(path, chunk, num=0):
     name = multiprocessing.current_process().name + "-" + str(num)
-    #save a human readable version
-    #fp = codecs.open(os.path.join(path, name) + '.txt', 'w')
-    #fp.write(chunk.encode("utf-8", "ignore"))
-    #fp.close()
 
-    #and an exploded version
     string = srilm.explode(chunk)
     fp = codecs.open(os.path.join(path, name) + '.exploded', 'w')
     fp.write(string)
     fp.close()
 
 
-def worker(outdir, inqueue, outqueue, purifier, alternate_heuristics=False):
+def worker(outdir, inqueue, outqueue, purifier):
 
     env = purifier.env
     
@@ -140,18 +104,11 @@ def worker(outdir, inqueue, outqueue, purifier, alternate_heuristics=False):
             #divide the sections into clean and dirty
             clean = ''
             dirty = ''
-            if alternate_heuristics:
-                for s in sections:
-                    if is_altdirty(s):
-                        dirty += s.string
-                    if is_altclean(s):
-                        clean += s.string
-            else:
-                for s in sections:
-                    if isdirty(s):
-                        dirty += s.string
-                    if isclean(s):
-                        clean += s.string
+            for s in sections:
+                if isdirty(s):
+                    dirty += s.string
+                if isclean(s):
+                    clean += s.string
 
 
             #add the result to our buffers and save them if they are big enough 
@@ -185,18 +142,13 @@ def worker(outdir, inqueue, outqueue, purifier, alternate_heuristics=False):
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser()
-    
+    parser.add_argument('sections', help="list of section headings")
     parser.add_argument('outdir')
     parser.add_argument('--processes', '-p', type=int, default=1)
     parser.add_argument('--max', '-m', type=int, help="get no more than this many articles")
     parser.add_argument('--exclude', '-e', type=str, help="list of articles to exclude from the training data")
-    parser.add_argument('--alternate', '-a', help='use alternate heuristics', action='store_true')
-    
     args = parser.parse_args()
-    
-
     
     env = wiki.makewiki(paths.paths["wikiconf"])
     act = template.create_actions(env, paths.paths["templaterules"], paths.paths["templatecache"])
@@ -204,12 +156,10 @@ if __name__ == "__main__":
     elementrules = node.read_rules(paths.paths["noderules"])
     #elementrules = multiprocessing.Manager().dict(node.read_rules(paths.paths["noderules"]))
 
-    purifier = purify.Purifier(env, act, elementrules)
-
-
+    purifier = classify.Preprocessor(env, act, elementrules)
 
     #read the sectioncounts
-    f = codecs.open(paths.paths["sections"], 'rb')
+    f = codecs.open(args.sections, 'rb')
     reader = csv.reader(f, delimiter='_', quoting=csv.QUOTE_NONE)
     for r in reader:
         #skip the headings
@@ -242,10 +192,9 @@ if __name__ == "__main__":
 
     #start worker processes
     ret = multiprocessing.Queue()
-    log.logger.info(time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime()) + ": Starting workers")
+    log.logger.info("Starting workers")
     for i in range(0, args.processes):
-        #purifier.act = template.TemplateActions(env=env, address=act.manager.address, authkey=multiprocessing.current_process().authkey)
-        p = multiprocessing.Process(target=worker, name=str(i), args=(args.outdir, names, ret, purifier, args.alternate))
+        p = multiprocessing.Process(target=worker, name=str(i), args=(args.outdir, names, ret, purifier))
             
         p.daemon = True
         p.start()
@@ -264,6 +213,6 @@ if __name__ == "__main__":
 
 
     log.logger.info("collected " + str(clean) + " clean characters and " + str(dirty) + " dirty")
-    log.logger.info(time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime()) + ": Done")
+    log.logger.info("Done")
 
         

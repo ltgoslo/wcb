@@ -14,6 +14,14 @@ class Preprocessor(Purifier):
         super(Preprocessor, self).__init__(env, templateactions, elementrules)
 
 
+    def purify(self, tree):
+        sections = super(Preprocessor, self).purify(tree)
+        #create HTML-style headings, 
+        for s in sections:
+            if isinstance(s.tree, advtree.Section):
+                s.heading = '<h' + str(s.tree.level) + '>' + s.title + '</h' + str(s.tree.level) + '>'
+        return sections
+
     def _node2str(self, n):
         ret = u''
         next = None
@@ -23,7 +31,7 @@ class Preprocessor(Purifier):
         #dont do anything fancy with text nodes
         if isinstance(n, advtree.Text):
             return n.caption
-        #special treatment for Section and Aricle
+        #special treatment for Section and Article
         elif isinstance(n, advtree.Article):
             ret = u'<h1>' + n.caption + u'</h1>\n'
             if n.children:

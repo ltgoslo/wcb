@@ -6,17 +6,17 @@
 # Lars J|rgen Solberg <larsjsol@sh.titan.uio.no> 2012
 #
 
-import argparse, sys, time, multiprocessing, copy, logging, traceback, Queue
-import paths, template, purify, node, myParseString, util
+import argparse, sys, time, multiprocessing, traceback, Queue
+import paths, template, classify, node, myParseString, util, log, list_articles
 from mwlib import wiki, nshandling, advtree
 from mwlib.templ import evaluate
 
 
-DEBUG = False
+DEBUG = log.DEBUG
 
 def worker(q, names, templr, noder):
     env = templr.env
-    purifier = purify.Purifier(env, templr, noder)
+    purifier = classify.Preprocessor(env, templr, noder)
     rm = nshandling.get_redirect_matcher(env.wiki.siteinfo, env.wiki.nshandler)
 
 
@@ -47,14 +47,14 @@ def worker(q, names, templr, noder):
                 #for skipping a page not in NS_MAIN
                 skipped += 1
         except Queue.Empty as excp:
-            logger.info("examined " + str(articles) + " articles, skipped " + str(skipped))                
+            log.logger.info("examined " + str(articles) + " articles, skipped " + str(skipped))                
             q.put(None)
             return
         except Exception as excp:
             msg = name + u": " + unicode(excp)
-            logger.error(msg.encode("utf-8", "ignore"))
+            log.logger.error(msg.encode("utf-8", "ignore"))
             if DEBUG:
-                logger.error(traceback.format_exc())
+                log.logger.error(traceback.format_exc())
 
 
 class Record:
@@ -74,7 +74,7 @@ class Record:
 def printres(results):
     l = results.values()
 
-    logger.info(time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime()) + ": Sorting " + str(len(l)) + " headings")
+    log.logger.info("Sorting " + str(len(l)) + " headings")
     l.sort(key=lambda x: x.count, reverse=True)
     
     print "name_count_avg length"
@@ -96,38 +96,27 @@ if __name__ == "__main__":
     templr = template.create_actions(env, paths.paths["templaterules"], paths.paths["templatecache"])
     noder = node.read_rules(paths.paths["noderules"])
 
-    logger = multiprocessing.log_to_stderr()
-    logger.setLevel(logging.INFO)
-    
 
-    logger.info("Listing articles")
+    log.logger.info("Listing articles")
     names = multiprocessing.Queue()
     
     if not args.max:
         args.max = len(env.wiki.reader.keys())
 
     i = 0
-    for n in env.wiki.reader.keys():
+    for n in list_articles.articles():
         if i < args.max:
             names.put(n)
             i += 1
         else:
             break
-
-    #deepycopy(tempr) doesent work...
-    templr.env = None
-    templr.exp = None
     
     #start the worker processes
     q = multiprocessing.Queue()
-    logger.info(time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime()) + ": Starting workers")
+    log.logger.info("Starting workers")
     for i in range(0, args.processes):
-        newtemplr = copy.deepcopy(templr)
-        newtemplr.env =  wiki.makewiki(paths.paths["wikiconf"])
-        newtemplr.exp = evaluate.Expander('', wikidb=newtemplr.env.wiki)
 
-        p = multiprocessing.Process(target=worker, args=(q, names, newtemplr, 
-                                                         copy.deepcopy(noder)))
+        p = multiprocessing.Process(target=worker, args=(q, names, templr, noder))
         p.daemon = True
         p.start()
 
@@ -147,7 +136,5 @@ if __name__ == "__main__":
             else:
                 res[r.name] = r
  
-    logger.info(time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime()) + ": All workers are done")
-
     printres(res)
-    logger.info(time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime()) + ": Done")
+    log.logger.info("Done")

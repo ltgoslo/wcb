@@ -194,7 +194,7 @@ def matchstring(s1, s2):
 
 class PureSection(object):
     #heading = None #<h1>Foo</h1>
-    #ftitle = None #Foo i.e. self.heading without the surrounding tags
+    #title = None #Foo i.e. self.heading without the surrounding tags
     #content = None #string[:len(heading)]
 
     def __init__(self, string, tree, purifier):
@@ -221,10 +221,7 @@ class PureSection(object):
         self.heading = purifier.elementrules.node_start(tree) + self.title + purifier.elementrules.node_end(tree)
         
         #the content without <h2>heading</h2>
-        #print self.string[:80]
-        #print self.heading
         self.content = string[len(self.heading) + 1:].strip()
-        #print self.content[:80]
         self.heading = self.heading.replace('\n', '')
         self.title = self.title.replace('\n', '')
         super(PureSection, self).__init__()
@@ -471,14 +468,12 @@ class Purifier(object):
                 else:
                     txt += getDisplayText(n)
                 #ignore this tag if the children dont produce any text
-                #txt = txt.strip()
                 if len(txt.strip()) > 0:
                     ret += txt
                     ret += self.elementrules.node_params(n) + self.elementrules.node_end(n)
                 else:
                     ret = u''
             else: #node.REMOVE
-                #if isinstance(n, advtree.AdvancedMath) or isinstance(n, advtree.Code):
                 if n.children:
                     for c in n.children:
                         ret += self._node2str(c)
@@ -486,26 +481,13 @@ class Purifier(object):
                     #fixme, this never happens
 
                     ret += getDisplayText(n)
-                #if isinstance(n, advtree.AdvancedMath) or \
-                #isinstance(n, advtree.Code):
 
 
         #add a newline after blocks
         if n.isblocknode and len(ret) > 0:
             if self.extra_newlines:
-            #    if isinstance(n, advtree.PreFormatted):
-            #        ret = ret.replace('\n', ' ')
                 ret = u'\n' + ret
             ret += u'\n'
-        #if isinstance(n, advtree.PreFormatted) or\
-        #        isinstance(n, advtree.Blockquote) or\
-        
-        #if isinstance(n, advtree.Code) or isinstance(n, advtree.Math):
-        #    ret = '<___' + ret +  '___>'
-   
-        #if (not n.__class__.__name__ == "Node" and not n.__class__.__name__ == "Text" and not n.isblocknode):
-        #    if len(ret) < 35:
-        #        ret = '<___' + ret +  '___>'
         
 
         return ret
@@ -529,13 +511,6 @@ if __name__ == "__main__":
     purifier.extra_newlines = args.extra_newlines
     purifier.keep_empty = args.keep_empty
    
-#    act = template.TemplateActions(env)
-#    act.set_action("Coor dm", "keep")
-#    act.set_action("Fact", "remove")
-#    act.set_action("Harvard citation", "keep")
-#    act.set_action("Ambox", "remove")
-
-
     
     raw = """
 This text is above all the headings
