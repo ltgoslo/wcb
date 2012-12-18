@@ -48,11 +48,11 @@ def rewrite_template(template_text):
     parts = template_text.group(0)
     parts = parts[len(template.delimiter_start):-len(template.delimiter_start)]
     parts = delimiter.split(parts)
-    res = u'⌊x¦' + parts[1] + u'¦' + parts[0]
+    res = u'⌊λ' + parts[1]
     params = u'¦'.join(parts[2:])
     if params:
         res += u'¦' + params
-    res += u'¦x⌋'
+    res += u'¦' + parts[0] + u'λ⌋'
     
     log.logger.debug(template_text.group(0) + ' ==> ' + res)
     return res

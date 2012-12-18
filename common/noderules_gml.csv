@@ -5,65 +5,68 @@ name	action	start	end	seperator	parameters
 		b) keep: keep both tag and content
 		c) replace: replace tag and content with a token
 		d) remove tag, but keep its content
-Section	keep	⌊=¦	¦=⌋	¦	level
-Article	keep	<___⌊document¦	¦document⌋___>
+        magic words: 
+        <___Foo___> dont allow sentece breaks in this element
+        ___NL___ this gets replaced with a newline
+Section	keep	⌊=	=⌋	¦	level
+Article	keep	<___⌊δ	δ⌋___>
 Source	purge	
-Code	keep	<___⌊ƒ¦	¦ƒ⌋___> 
+Code	keep	<___⌊◊	◊⌋___> 
 BreakingReturn	purge	
 HorizontalRule	purge	
 Index	purge	
-Teletyped	keep	⌊t¦	¦t⌋
+Teletyped	keep	⌊τ	τ⌋
 Reference	purge	
 ReferenceList	purge	
 Gallery	purge	
 Center	remove	
-Div	keep	⌊p¦	¦p⌋
+Div 	keep	<______>	___NL___
 Span	remove	
 Font	remove	
-Strike	keep	⌊-¦	¦-⌋
+Strike	keep	⌊-	-⌋
 ImageMap	purge	
 Ruby	remove	
 RubyBase	remove	
 RubyText	purge	
 RubyParantheses	purge	
-Deleted	keep	⌊-¦	¦-⌋
-Inserted	keep	⌊_¦	¦_⌋
+Deleted	keep	⌊-	-⌋
+Inserted	keep	⌊_	_⌋
 Caption	purge	
 Table	purge	
 Row	purge	
 Cell	purge	
-Abbreviation	keep	⌊.¦	¦.⌋	¦	title
-Math	keep	<___⌊ƒ¦	¦ƒ⌋___>
+Abbreviation	keep	⌊µ	µ⌋	¦	title
+Math	keep	<___⌊×	×⌋___>
 DefinitionList	remove
-Item	keep	⌊#¦	¦#⌋
-ItemList	keep	⌊•¦	¦•⌋
-DefinitionTerm	keep	⌊:¦	¦:⌋
-DefinitionDescription	keep	⌊⇥¦	¦⇥⌋
-Heading	keep	⌊=¦	¦=⌋	level
+Item	keep	⌊#	#⌋
+ItemList	keep	⌊•	•⌋
+DefinitionTerm	keep	⌊:	:⌋
+DefinitionDescription	keep	⌊⇥	⇥⌋
+Heading	keep	⌊=	=⌋  ¦   level
 TimeLine	purge
-Italic	keep	⌊/¦	¦/⌋
-Bold	keep	⌊*¦	¦*⌋
-Strong	keep	⌊*¦	¦*⌋
-Blockquote	keep	⌊"¦	¦"⌋
-Underline	keep	⌊_¦	¦_⌋
-Overline	keep	⌊-¦	¦-⌋
-Sub	keep	⌊,¦	¦,⌋
-Sup	keep	⌊^¦	¦^⌋
-Small	keep	⌊↓¦	¦↓⌋
-Big	keep	⌊↑¦	¦↑⌋
-Cite	keep	⌊'¦	¦'⌋
-Var	keep	⌊ƒ¦	¦ƒ⌋
-Preformatted	keep	⌊pre¦	¦pre⌋
-Poem	keep	⌊pre¦	¦pre⌋
+Italic	keep	⌊/	/⌋
+Bold	keep	⌊∗	∗⌋
+Strong	keep	⌊∗	∗⌋
+Blockquote	keep	⌊"	"⌋
+Underline	keep	⌊_	_⌋
+Overline	keep	⌊-	-⌋
+Sub	keep	⌊,	,⌋
+Sup	keep	⌊^	^⌋
+Small	keep	⌊↓	↓⌋
+Big	keep	⌊↑	↑⌋
+Cite	keep	⌊<	<⌋
+Var	keep	⌊◊	◊⌋
+Preformatted	keep	⌊π	π⌋
+Poem	keep	⌊π	π⌋
 Comment	purge
-URL	keep	⌊>¦	¦>⌋
-ArticleLink	keep	⌊>¦	¦>⌋	
-InterwikiLink	keep	⌊>¦	¦>⌋
+URL	keep	⌊>	>⌋
+ArticleLink	keep	⌊>	>⌋	
+InterwikiLink	keep	⌊>	>⌋
 CategoryLink	purge	
-ImageLink	replace	⌊img⌋
+ImageLink	replace	⌊✎⌋
 LangLink	purge	
-NamedURL	keep	⌊>¦	¦>⌋
-NameSpaceLink	keep	⌊>¦	¦>⌋
-Paragraph	keep	⌊p¦	¦p⌋
-Emphasized	keep	⌊/¦	¦/⌋
+NamedURL	keep	⌊>	>⌋
+NameSpaceLink	keep	⌊>	>⌋
+Paragraph	keep	<______>	___NL___
+Emphasized	keep	⌊/	/⌋
 Hieroglyphs	purge	

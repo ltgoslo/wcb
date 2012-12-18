@@ -22,6 +22,8 @@ def make_entry(name):
     _nextid += 1
     return e #[id, name, gml, sections]
 
+re_par = re.compile(ur'___NL___$', re.U)
+
 _seg_id = 101
 _art_id = 100
 def write_segment(outdir, entries):
@@ -33,6 +35,8 @@ def write_segment(outdir, entries):
         sent_id = 0
         if e[2] and e[2].strip():
             for line in e[2].splitlines():
+                line = re_par.sub('\n', line)
+                line = line.replace('___NL___', '') #only insert paragraph breaks at the end of a sentence
                 f.write('[1{0:07}{1:05}] |{2}\n'.format(_art_id, sent_id, line.encode('utf-8')))
                 sent_id += 10
             _art_id += 1
@@ -198,7 +202,7 @@ if __name__ == "__main__":
 
             while processed < len(entries) and entries[processed][2] != None:
                 if entries[processed][2].strip():
-                    if not u'⌊document¦' in entries[processed][2]:
+                    if not u'⌊δ' in entries[processed][2]:
                         log.logger.error("Missing fist line of " + entries[processed][1])
                     ready += 1
                 processed += 1

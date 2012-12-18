@@ -11,34 +11,7 @@ import os, codecs, traceback, re, gzip, signal
 import gml, senseg, classify, paths, util, srilm
 import log, util, list_articles, template, node, purify
 from mwlib import wiki, advtree
-
-class TimeoutException(Exception):
-    pass
-
-_nextid = 0
-def make_entry(name):
-    global _nextid
-    e = [_nextid, name, None, []]
-    _nextid += 1
-    return e #[id, name, gml, sections]
-
-_seg_id = 101
-_art_id = 100
-def write_segment(outdir, entries):
-    global _art_id
-    global _seg_id
-
-    f =  gzip.open(os.path.join(outdir, '{0:05}'.format(_seg_id) + '.gml.gz'), 'wb')
-    for e in entries:
-        sent_id = 0
-        if e[2] and e[2].strip():
-            for line in e[2].splitlines():
-                f.write('[1{0:07}{1:05}] |{2}\n'.format(_art_id, sent_id, line.encode('utf-8')))
-                sent_id += 10
-            _art_id += 1
-        e[2] = None
-    _seg_id += 1
-
+from build_corpus import make_entry, write_segment, TimeoutException
 
 re_article_tag = re.compile(r'</?article>', re.U)
 def readfile_wm(filename):
@@ -193,7 +166,7 @@ if __name__ == "__main__":
 
             while processed < len(entries) and entries[processed][2] != None:
                 if entries[processed][2].strip():
-                    if not u'⌊document¦' in entries[processed][2]:
+                    if not u'⌊δ' in entries[processed][2]:
                         log.logger.error("Missing fist line of " + entries[processed][1])
                     ready += 1
                 processed += 1

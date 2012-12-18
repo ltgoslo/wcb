@@ -26,11 +26,15 @@ def articles():
         names = [k for k in env.wiki.reader.keys() if env.wiki.nshandler.splitname(k)[0] == nshandling.NS_MAIN]
         log.logger.info("writing names to " + os.path.join(paths.paths["tmp"], 'articles.list'))
         f = codecs.open(os.path.join(paths.paths["tmp"], 'articles.list'), 'w', 'utf-8')
+        names_nord = [] #names - redirects 
         for n in names:
             raw = env.wiki.reader[n]
             if not rm(raw):
                 f.write(n + '\n')
+                names_nord.append(n)
         f.close()
+        return names_nord
+        
     return names
     
 
