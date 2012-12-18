@@ -10,7 +10,7 @@ import node, paths, senseg
 import argparse, collections, re
 from mwlib import wiki, advtree 
 
-re_empty = re.compile(ur'⌊(.+?)¦[ \t\r\f\v]*¦\1⌋', re.U)
+re_empty = re.compile(ur'⌊(.)[ \t\r\f\v]*\1⌋', re.U)
 
 def arrow(text):
     text = text.group(1)
