@@ -124,25 +124,25 @@ class Client:
                     ret.append(' '.join(words[max(0, i - self.order):i]) + '\n')
         return ret
 
+    _prob_sep = re.compile('[\0\n]+')
     def recv(self, n):
         buf = self._buf
-        p = re.split('\0+', buf)
+        p = Client._prob_sep.split(buf)
         probs = p[:-1]
         if len(probs) > 0 and probs[0] == '':
             probs = probs[1:]
-        #log.logger.info("(" + str(self.port) + ") recived " + str(len(probs)) + " expecting " + str(n))            
         buf = p[-1]
         while len(probs) < n:
             reply = buf + self.conn.recv(4096)
-            p = re.split('\0+', reply)
+            p = Client._prob_sep.split(reply)
             probs.extend(p[:-1])
             buf = p[-1]
-            #log.logger.info("(" + str(self.port) + ") recived " + str(len(probs)) + " expecting " + str(n))
             
-        self._buf = '\0'.join(probs[n:]) + '\0' + buf
+        self._buf = '\n'.join(probs[n:]) + '\n' + buf
         ret = 0.0
         for p in probs[:n]:
-            ret += float(p)
+            if p:
+                ret += float(p)
         return ret
 
 def vocab_size(lm):
