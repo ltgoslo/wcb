@@ -11,6 +11,8 @@ import argparse, collections, re
 from mwlib import wiki, advtree 
 
 re_empty = re.compile(ur'⌊(.)[ \t\r\f\v]*\1⌋', re.U)
+re_par = re.compile(ur'___NL___$', re.U)
+
 
 def arrow(text):
     text = text.group(1)
