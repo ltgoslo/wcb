@@ -115,16 +115,14 @@ if __name__ == "__main__":
     #senseg
         senseg_purifier = purify.Purifier(env, act, node.read_rules(paths.paths["noderules_senseg"]))
         senseg_purifier.extra_newlines = True
-
-        #for s in sections:
-        #    print s.title
-        #    print s.level
-        #    print s.clean
-        #    print s.sprint
-        #    print 
-        #FIXME does not check for empty sections    
+    
         for s in senseg.senseg_sections(senseg_purifier, gml_purifier, clean, escape):
-            print fix_templates(s).encode('utf-8')
+            gml_s = fix_templates(s).encode('utf-8')
+            if gml_s and gml_s.strip():
+                for line in gml_s.splitlines():
+                    line = re_par.sub('\n', line)
+                    print line.replace('___NL___', '') #only insert paragraph breaks at the end of a sentence
+                    
     else:
         for s in clean:
-            print fix_templates(gml_purifier.node2str(s.tree)).encode('utf-8')
+            print fix_templates(gml_purifier.node2str(s.tree)).encode('utf-8').replace('___NL___', '')
