@@ -103,7 +103,7 @@ def worker(outdir, inqueue, outqueue,
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('article_list')
+    parser.add_argument('file_list')
     parser.add_argument('out_dir')
     parser.add_argument('--clean-port', '-c', default='5000', help='which port should the "clean" model bind to (default: 5000)')
     parser.add_argument('--dirty-port', '-d', default='5001', help='which port should the "dirty" model bind to (default: 5001)')
@@ -114,7 +114,7 @@ if __name__ == "__main__":
     names = multiprocessing.Queue()
 
     entries = []
-    with codecs.open(args.article_list, 'r', 'utf-8') as f:
+    with codecs.open(args.file_list, 'r', 'utf-8') as f:
         for line in f:
             e = make_entry(line.strip())
             names.put(e)
