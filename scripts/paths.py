@@ -23,6 +23,9 @@ def read_paths(filename):
         if '=' in pair:
             pair = pair.split('=')
             paths[pair[0].strip()] = os.path.join(dirname, pair[1].strip())
+    #make sure that the tmp directory exists
+    if not os.path.isdir(paths['tmp']):
+        os.makedirs(paths['tmp'])
     f.close()
 
 if 'PATHSFILE' in os.environ:

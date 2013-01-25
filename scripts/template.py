@@ -377,7 +377,6 @@ def write_rules(rules_file, actions):
     """
     Saves rules to a file that can be read by read_rules()
     """
-    os.makedirs(os.path.split(rules_file)[0]) #make sure the directory exists
     f = open(rules_file, 'w')
     f.write("template_action_comment\n")
     for t in actions.removes.keys():
