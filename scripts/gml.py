@@ -121,7 +121,7 @@ if __name__ == "__main__":
             if gml_s and gml_s.strip():
                 for line in gml_s.splitlines():
                     line = re_par.sub('\n', line)
-                    print line.replace('___NL___', '') #only insert paragraph breaks at the end of a sentence
+                    print line.replace('___NL___', '') #only insert line breaks at the end of a sentence
                     
     else:
         for s in clean:
