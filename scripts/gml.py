@@ -100,7 +100,7 @@ if __name__ == "__main__":
     
     #classifiy sections
     preprocessor = classify.Preprocessor(env, act, node.read_rules(paths.paths["noderules"]))
-    sections = preprocessor.parse_and_purify(args.article)
+    sections = preprocessor.parse_and_purify(args.article, follow_redirects=True)
     clean,dirty = classify.classify(sections, clean_port=args.clean_port, dirty_port=args.dirty_port)
     filter_sections(sections)
 

@@ -325,14 +325,22 @@ class Purifier(object):
         super(Purifier, self).__init__()
 
 
-    def parse_and_purify(self, title):
+    def parse_and_purify(self, title, follow_redirects=False):
         """
         parses the named article and returns it as a list of PureSections, returns None for redirects
         """
         title = title.decode('utf-8')
         raw = self.env.wiki.reader[title]
-        if self.rm(raw):
-            return None
+
+        #check for redirect
+        target = self.rm(raw) 
+        if target:
+            if follow_redirects:
+                log.logger.info(title + ' redirects to ' + target)
+                return self.parse_and_purify(target)
+            else:
+                return None
+
         else:    
             markup = self.templateactions.handle_templates(raw, title=title)
             tree = myParseString.myParseString(title=title, raw=markup, wikidb=self.env.wiki, 
