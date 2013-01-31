@@ -329,6 +329,7 @@ class Purifier(object):
         """
         parses the named article and returns it as a list of PureSections, returns None for redirects
         """
+        title = title.decode('utf-8')
         raw = self.env.wiki.reader[title]
         if self.rm(raw):
             return None
