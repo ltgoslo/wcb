@@ -12,6 +12,8 @@
 import os, argparse
 import log
 
+logger = log.getLogger(__name__)
+
 paths = {}
 
 def read_paths(filename):
@@ -31,7 +33,7 @@ def read_paths(filename):
 if 'PATHSFILE' in os.environ:
     read_paths(os.environ['PATHSFILE'])
 else:
-    log.logger.warning("PATHSFILE not set")
+    logger.warning("PATHSFILE not set")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
