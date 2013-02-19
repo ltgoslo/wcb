@@ -10,6 +10,7 @@ import os, re, signal, time, socket, string, codecs, atexit
 import inspect, gzip, mimetypes
 import paths, log, util
 
+logger = log.getLogger(__name__)
 
 class Server:
     pid = -1
@@ -46,15 +47,15 @@ class Server:
             self.q.put(None)
             time.sleep(2)
             if os.path.exists("/proc/" + str(self.pid)):
-                log.logger.warning(str(self.pid) + " still running, attempting to kill")
+                logger.warning(str(self.pid) + " still running, attempting to kill")
                 try:
                     os.kill(self.pid, signal.SIGTERM)
                 except Exception as e:
-                    log.logger.error(str(e))
+                    logger.error(str(e))
             self.pid = -1
 
     def _start_server(self, q):
-        log.logger.info("running: " + ' '.join(self.ngram_args))
+        logger.info("running: " + ' '.join(self.ngram_args))
         #print args
         server = subprocess.Popen(self.ngram_args, stderr=subprocess.PIPE, shell=False)
         #wait until the server is ready
@@ -66,11 +67,11 @@ class Server:
             out = server.stderr.readline()
             if len(out) > 0:
                 if "starting prob server on port" in out:
-                    log.logger.info(out.strip())
-                    log.logger.info("server pid: " + str(server.pid))
+                    logger.info(out.strip())
+                    logger.info("server pid: " + str(server.pid))
                     q.put(server.pid)
                 elif not "connection accepted" in out and not "probabilities served" in out:
-                    log.logger.error(out.strip())
+                    logger.error(out.strip())
                     raise Exception(out.strip())
 
 class Client:
@@ -89,7 +90,7 @@ class Client:
         self.conn.settimeout(60)
         reply = self.conn.recv(32)
         if not "probserver ready" in reply:
-            log.logger("unexpected reply: " + reply)
+            logger("unexpected reply: " + reply)
             raise Exception("unexpected reply: " + reply)
         
     def __del__(self):
@@ -208,21 +209,21 @@ def max_order(lm):
 def make_lm(lm, trainset, order, args, overwrite=False):
     nargs = ['ngram-count', '-unk', '-text', trainset, '-lm', lm, '-order', str(order), '-memuse']
     nargs.extend(args)
-    log.logger.debug("building " + lm)
+    logger.debug("building " + lm)
 #    print nargs
 
     if not overwrite:
         if os.path.exists(lm) and os.stat(lm).st_mtime > os.stat(trainset).st_mtime:
-            log.logger.info(lm + ' already exists, not rebuilding it') 
+            logger.info(lm + ' already exists, not rebuilding it') 
             return 0.0
 
     start = time.time()
     p = subprocess.Popen(nargs, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=False)
     err,out = p.communicate()
     if err:
-        log.logger.error(' '.join(nargs) + ': ' + err)
+        logger.error(' '.join(nargs) + ': ' + err)
     if out:
-        log.logger.info(' '.join(nargs) + ': ' + out)
+        logger.info(' '.join(nargs) + ': ' + out)
 
     stop = time.time()
     return round(stop - start)
@@ -259,7 +260,7 @@ def classify_bulk(ss, client1, client2):
     if inspect.isgenerator(ss):
         ss = [s for s in ss]
 
-    log.logger.debug(str(len(ss)) + " sections")
+    logger.debug(str(len(ss)) + " sections")
     max_size = 131072 #adjust until deadlock...
     probs = [0.0] * len(ss) # probability for each s
     ngrams = [] #all ngrams
@@ -299,7 +300,7 @@ def classify_bulk(ss, client1, client2):
                 #n_start += 1
                 chunk_size = 0
 
-    log.logger.debug("done")
+    logger.debug("done")
     return probs
                 
             

@@ -19,14 +19,14 @@ EXPAND = 0
 REMOVE = 1
 KEEP = 2
 
-DEBUG = log.DEBUG
-
 #delimiter = unicodedata.lookup("REPLACEMENT CHARACTER")
 delimiter = u"+"
 delimiter_start = u"{("
 delimiter_end = u")}"
 
 _action_map = {"expand": 0, "remove": 1, "keep": 2}
+
+logger = log.getLogger(__name__)
 
 def action_code(action):
     """
@@ -159,7 +159,7 @@ class TemplateActions:
         parsed = parser.parse(raw, included=False, replace_tags=self.exp.uniquifier.replace_tags)
         m = []
         for i in parsed:
-            log.logger.debug(repr(i))
+            logger.debug(repr(i))
             if isinstance(i, nodes.Template):
                 #t = MyTemplate(self, i)
                 t = i
@@ -172,7 +172,7 @@ class TemplateActions:
                 m.append(i)
         ret = []
         self._handle_marks(m, ret)
-        log.logger.debug('cache size: ' + str(len(self.exp.parsedTemplateCache)))
+        logger.debug('cache size: ' + str(len(self.exp.parsedTemplateCache)))
         
         return  self._expand(ret)
 
@@ -201,7 +201,7 @@ class TemplateActions:
         i = 0
 
         while i < len(m):
-            log.logger.debug(repr(m[i]))
+            logger.debug(repr(m[i]))
             if isinstance(m[i], marks.mark_start):
                 a = self.get_action(eval(m[i].msg))
                 if a == EXPAND:
@@ -227,9 +227,7 @@ class TemplateActions:
         i = 0
         name = eval(m[0].msg)
         for n in m:
-            if DEBUG:
-                print "remove mark: ", 
-                print repr(n)
+            logger.debug(repr(n))
             if isinstance(n, marks.mark_end) and eval(n.msg) == name:
                 #self._handle_marks(m[i + 1:], res)
                 return i + 1
@@ -275,20 +273,13 @@ class TemplateActions:
 
         i = 0
         for n in m:
-            if DEBUG:
-                print "keep mark: ", 
-                print repr(n)
+            logger.debug(repr(n))
             #were done with this template, add the arguments and call _handle_marks
             if isinstance(n, marks.mark_end) and eval(n.msg) == name:
                 res.append(n)
-                #this is a bit clumsy, but insert newlines if the expanded template ends in a table
-#                if not isinstance(res[-2], marks.mark):
-#                    if res[-2][-2:] == '|}':
-#                        res.append('\n')
                 res.append(delimiter)
                 res.extend(delimiter.join(args))
                 res.append(delimiter_end)
-                #self._handle_marks(m[i + 1:], res)
                 return i + 1
             # weed out argument marks
             if not isinstance(n, mark_argument):
@@ -323,7 +314,7 @@ def expand_rules(env, rules):
                 act.set_action(page.names[-1], r[1])
             else:
                 act.set_action('Template:' + r[0], r[1])
-                log.logger.warn("Could not find {{" +  r[0].encode("utf-8", "ignore") + "}}")
+                logger.warn("Could not find {{" +  r[0].encode("utf-8", "ignore") + "}}")
     return act
 
 def expand_cached_rules(env, rules):
@@ -345,12 +336,12 @@ def expand_cached_rules(env, rules):
 #uses cached rules if possible, creates cache if not                       
 def create_actions(env, rules, cache):
     if os.path.exists(cache) and os.stat(cache).st_mtime > os.stat(rules).st_mtime:
-        log.logger.info("reading cached rules from: " + cache)
+        logger.info("reading cached rules from: " + cache)
         act = expand_cached_rules(env, read_rules(cache))
     else:
-        log.logger.info("reading rules from: " + rules)
+        logger.info("reading rules from: " + rules)
         act = expand_rules(env, read_rules(rules))
-        log.logger.info("creating cache-file: " + cache)
+        logger.info("creating cache-file: " + cache)
         write_rules(cache, act)
     
     return act

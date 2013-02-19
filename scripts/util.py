@@ -10,6 +10,7 @@ from mwlib import nuwiki, wiki
 import codecs, re, shlex, subprocess
 import srilm, log, paths, os, glob
 
+logger = log.getLogger(__name__)
 
 #cdb is no longer supported by mwlib, we use the third party module mwlib.cdb instead
 def wiki_nucdb(path=None, lang="en", **kwargs):
@@ -65,10 +66,10 @@ def is_exploded(filename):
 
 def sections(filename):
     if is_exploded(filename):
-        log.logger.debug(filename + " seems to be exploded")
+        logger.debug(filename + " seems to be exploded")
         return exploded_sections(filename)
     else:
-        log.logger.debug(filename + " seems to be unexploded")
+        logger.debug(filename + " seems to be unexploded")
         return unexploded_sections(filename)
 
 

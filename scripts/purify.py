@@ -15,6 +15,8 @@ import sys, locale, argparse, re, collections, string
 import template, node, myParseString, myUniquifier, paths
 import util, log
 
+logger = log.getLogger(__name__)
+
 
 DEBUG = False
 
@@ -88,10 +90,10 @@ def markup_sentences(purifier, puresection, sentences, escape_function=None):
                     nodetext = t[token_frag:]
                     sentence_frag, node_frag = matchstring(sentence, nodetext)
                     markup += escape_function(sentence[:sentence_frag])
-                    log.logger.debug('nodetext: "' + nodetext[:node_frag] + '"')
-                    log.logger.debug('sentence: "' + sentence + '"')
+                    logger.debug('nodetext: "' + nodetext[:node_frag] + '"')
+                    logger.debug('sentence: "' + sentence + '"')
                     sentence = sentence[sentence_frag:]
-                    log.logger.debug('sentence: "' + sentence + '"')
+                    logger.debug('sentence: "' + sentence + '"')
                     if not sentence:
                         closing = True
 
@@ -185,7 +187,7 @@ def matchstring(s1, s2):
         off2 += 1
 
 
-    log.logger.debug(s1 + ', ' + s2 + ' == > ' + str(off1) + ', ' + str(off2))
+    logger.debug(s1 + ', ' + s2 + ' == > ' + str(off1) + ', ' + str(off2))
     return (off1, off2)
 
 
@@ -336,7 +338,7 @@ class Purifier(object):
         target = self.rm(raw) 
         if target:
             if follow_redirects:
-                log.logger.info(title + ' redirects to ' + target)
+                logger.info(title + ' redirects to ' + target)
                 return self.parse_and_purify(target)
             else:
                 return None

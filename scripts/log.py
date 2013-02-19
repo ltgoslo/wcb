@@ -8,21 +8,32 @@
 
 import multiprocessing, logging, os
 
+
+def getLogger(module):
+    logger = logging.getLogger(module)
+    handler = logging.StreamHandler()
+    handler.setFormatter(logging.Formatter('[%(asctime)s %(module)s.%(funcName)s()] %(message)s'))
+    logger.addHandler(handler)
+
+
+    if module in loglevels:
+        logger.setLevel(loglevels[module])
+    else:
+        logger.setLevel(logging.WARN)
+    
+    return logger
+
+
 DEBUG = False
 
+loglevels = {'unspecified': logging.INFO}
+if 'DEBUG' in os.environ:
+    for module in os.environ['DEBUG'].split(':'):
+        loglevels[module] = logging.DEBUG
+if 'INFO' in os.environ:
+    for module in os.environ['INFO'].split(':'):
+        loglevels[module] = logging.INFO
 
-if 'DEBUG' in os.environ and bool(os.environ['DEBUG']):
-    DEBUG = True
-else:
-    DEBUG = False
 
-try:
-    tmp = logger
-except NameError:
-    logger = multiprocessing.log_to_stderr()
-    if DEBUG:
-        logger.setLevel(logging.DEBUG)
-    else:
-        logger.setLevel(logging.INFO)
 
-    logger.handlers[0].setFormatter(logging.Formatter('[%(asctime)s %(funcName)s()] %(message)s'))
+logger = getLogger('unspecified') #some old scripts might still do log.logger.debug('Foo')

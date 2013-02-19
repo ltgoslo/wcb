@@ -13,6 +13,8 @@ from mwlib import wiki, advtree
 re_empty = re.compile(ur'⌊(.)[ \t\r\f\v]*\1⌋', re.U)
 re_par = re.compile(ur'___NL___$', re.U)
 
+logger = log.getLogger(__name__)
+
 
 def arrow(text):
     text = text.group(1)
@@ -56,7 +58,7 @@ def rewrite_template(template_text):
         res += u'¦' + params
     res += u'¦' + parts[0] + u'λ⌋'
     
-    log.logger.debug(template_text.group(0) + ' ==> ' + res)
+    logger.debug(template_text.group(0) + ' ==> ' + res)
     return res
                                  
 fix_templates = postprocess
@@ -104,8 +106,8 @@ if __name__ == "__main__":
     clean,dirty = classify.classify(sections, clean_port=args.clean_port, dirty_port=args.dirty_port)
     filter_sections(sections)
 
-    log.logger.debug('clean sections: ' + ', '.join([s.title for s in clean]))
-    log.logger.debug('dirty sections: ' + ', '.join([s.title for s in dirty]))
+    logger.debug('clean sections: ' + ', '.join([s.title for s in clean]))
+    logger.debug('dirty sections: ' + ', '.join([s.title for s in dirty]))
 
     #gml
     gml_purifier = purify.Purifier(env, act, node.read_rules(paths.paths["noderules_gml"]))

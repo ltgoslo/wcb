@@ -10,6 +10,9 @@ import argparse, csv, sys, codecs
 from mwlib import advtree
 import log
 
+
+logger = log.getLogger(__name__)
+
 KEEP = 0
 REMOVE = 1
 PURGE = 2
@@ -87,7 +90,7 @@ class Rules:
             else:
                 r = prop[node.caption]
         except KeyError:
-            log.logger.error('Unknown property: ' + repr(prop) + '(' + repr(node) + ')')        
+            logger.error('Unknown property: ' + repr(prop) + '(' + repr(node) + ')')        
             r = default
         #log.logger.debug(repr(r))
         return r

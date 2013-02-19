@@ -13,12 +13,13 @@ from mwlib.templ.nodes import *
 from collections import Sequence
 import copy
 
-import myMagic
+import myMagic, log
+
+logger = log.getLogger(__name__)
 
 
 class mark_argument(marks.mark): pass
 
-DEBUG = False
 
 #a mixin for  mwlib.templ.nodes.Template
 #inserts mark_argument for all template calls
@@ -86,11 +87,7 @@ class MyTemplate:
         else:            
             p = expander.getParsedTemplate(name)
             if p:
-
-                #p = self._fix_parsed_template(p)
-                if DEBUG:
-                    msg = "MyTemplate EXPANDING %r %r  ===> " % (name, var)
-                    oldidx = len(res)
+                oldidx = len(res)
                 res.append(mark_start(repr(name)))
                 for i in var.args:
                     if isinstance(i, Variable):
@@ -116,9 +113,7 @@ class MyTemplate:
                 flatten(p, expander, var, res)
                 res.append(mark_end(repr(name)))
                 
-                if DEBUG:
-                    msg += repr("".join(res[oldidx:]))
-                    print msg
+                logger.debug("EXPANDING {{%r}} %r  ===> %s" % (name, var, "".join(res[oldidx:])))
         
 Template.__bases__ = (MyTemplate,) + Template.__bases__
 Template._flatten = MyTemplate._flatten
