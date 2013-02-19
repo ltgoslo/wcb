@@ -303,43 +303,5 @@ def classify_bulk(ss, client1, client2):
     logger.debug("done")
     return probs
                 
-            
-
-        
-
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    #parser.add_argument('pathsfile')
-    #parser.add_argument('outdir')
-    #parser.add_argument('--processes', '-p', type=int, default=1)
-    args = parser.parse_args()
-    #paths.read_paths(args.pathsfile)
-
-    #start the servers
-#    clean_srv = Server(3012, lm=paths.paths["clean lm"])
-#    dirty_srv = Server(3013, lm=paths.paths["dirty lm"])
-#    clean = Client(clean_srv.port)
-#    dirty = Client(dirty_srv.port)
-
-    #print vocab_size(paths.paths["clean lm"])
-    #print lm_size(paths.paths["clean lm"])
-    #print perplexity(paths.paths["clean lm"], "/ltg/larsjsol/master/exp/trainingdata/clean/0-0.exploded")
-    #make_lm("/ltg/larsjsol/test.lm", "/ltg/larsjsol/master/exp/trainingdata/clean/0-0.exploded", 5, '-kndiscount')
-
-    text = u"""<h2>Geography</h2>
-<ImageLink />
-<p>Alabama is the 30<sup>th</sup> largest state in the United States with 52,423 square miles (135,775Â kmÂ²) of total area: 3.19% of the area is water, making Alabama 23<sup>rd</sup> in the amount of surface water, also giving it the second largest inland waterway system in the <ArticleLink>United States</ArticleLink>. About three-fifths of the land area is a gentle plain with a general descent towards the <ArticleLink>Mississippi River</ArticleLink> and the Gulf of Mexico. The <ArticleLink>North Alabama</ArticleLink> region is mostly mountainous, with the <ArticleLink>Tennessee River</ArticleLink> cutting a large valley creating numerous creeks, streams, rivers, mountains, and lakes. A notable natural wonder in Alabama is <ArticleLink>"Natural Bridge"</ArticleLink> rock, the longest <ArticleLink>natural bridge</ArticleLink> east of the <ArticleLink>Rockies</ArticleLink>, located just south of <ArticleLink>Haleyville</ArticleLink>, in <ArticleLink>Winston County</ArticleLink>.</p>
-<p>Alabama generally ranges in elevation from <ArticleLink>sea level</ArticleLink> at <ArticleLink>Mobile Bay</ArticleLink> to over 1,800Â feet (550Â m) in the <ArticleLink>Appalachian Mountains</ArticleLink> in the northeast. The highest point is <ArticleLink>Mount Cheaha</ArticleLink> (<Emphasized>see map</Emphasized>), at a height of 2,407Â ft (733Â m).</p>
-<p>States bordering Alabama include <ArticleLink>Tennessee</ArticleLink> to the north; <ArticleLink>Georgia</ArticleLink> to the east; <ArticleLink>Florida</ArticleLink> to the south; and <ArticleLink>Mississippi</ArticleLink> to the west. Alabama has coastline at the <ArticleLink>Gulf of Mexico</ArticleLink>, in the extreme southern edge of the state.</p>
-<p>Areas in Alabama administered by the <ArticleLink>National Park Service</ArticleLink> include <ArticleLink>Horseshoe Bend National Military Park</ArticleLink> near <ArticleLink>Alexander City</ArticleLink>; <ArticleLink>Little River Canyon National Preserve</ArticleLink> near <ArticleLink>Fort Payne</ArticleLink>; <ArticleLink>Russell Cave National Monument</ArticleLink> in <ArticleLink>Bridgeport</ArticleLink>; <ArticleLink>Tuskegee Airmen National Historic Site</ArticleLink> in <ArticleLink>Tuskegee</ArticleLink>; and <ArticleLink>Tuskegee Institute National Historic Site</ArticleLink> near <ArticleLink>Tuskegee</ArticleLink>.</p>
-<p>Alabama also contains the <ArticleLink>Natchez Trace Parkway</ArticleLink>, the <ArticleLink>Selma To Montgomery National Historic Trail</ArticleLink>, and the <ArticleLink>Trail Of Tears National Historic Trail</ArticleLink>.</p>
-<p>Suburban <ArticleLink>Baldwin County</ArticleLink>, along the Gulf Coast, is the largest county in the state in both land area and water area.</p>
-<p>A {(Convert+5-mile (8Â km)+5+mi+km+0+sing=on)}-wide meteorite impact crater is located in <ArticleLink>Elmore County</ArticleLink>, just north of Montgomey. This is the <ArticleLink>Wetumpka crater</ArticleLink>, which is the site of "Alabama's greatest natural disaster".  A {(Convert+1000-foot (300Â m)+1000+f+m+sing=on)}-wide meteorite hit the area about 80Â million years ago. The hills just east of downtown <ArticleLink>Wetumpka</ArticleLink> showcase the erodedremains of the impact crater that was blasted into the bedrock, with the area labeled the <ArticleLink>Wetumpka crater</ArticleLink> or astrobleme ("star-wound") because of the concentric rings of fractures and zones of shattered rock that can be found beneath the surface. In 2002, Christian Koeberl with the Institute of Geochemistry University of Vienna published evidence and established the site as an internationally recognized impact crater.</p>"""
-#    c = classify(text, clean, dirty)
-#    print "classify(...): -> " + str(c),
-#    if c > 0:
-#        print " clean"
-#    else:
-#        print " dirty"
-
-#print max_order('cache/lm/clean_3gram_10train_ukndiscount.lm')
+    pass

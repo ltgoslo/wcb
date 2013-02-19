@@ -187,7 +187,6 @@ class TemplateActions:
                 token.flatten(self.exp, args, m)
                 m[0] = u''
                 m = u''.join(m)
-                #markup += self.exp.uniquifier.replace_uniq(m)
                 markup += m
             elif isinstance(token, basestring):
                 markup += token

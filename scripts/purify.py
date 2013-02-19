@@ -25,7 +25,6 @@ amap = {advtree.Text:"caption",
         advtree.Link:"target",
         advtree.URL:"caption",
         advtree.Math:"caption",
-        #advtree.ImageLink:"caption",
         advtree.ArticleLink:"target",
         advtree.NamespaceLink:"target",
         advtree.Article:"caption",}
