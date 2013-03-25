@@ -6,114 +6,132 @@
 # Lars J|rgen Solberg <larsjsol@sh.titan.uio.no> 2012
 #
 
-import argparse, multiprocessing, collections, Queue
-import os, codecs, traceback, re, gzip, signal
-import gml, senseg, classify, paths, util, srilm
-import log, util, list_articles, template, node, purify
-from mwlib import wiki, advtree
+import argparse
+import multiprocessing
+import collections
+import Queue
+import os
+import codecs
+import traceback
+import re
+import gzip
+import signal
+
+import gml
+import senseg
+import classify
+import paths
+import util
+import srilm
+import log
+import list_articles
+import template
+import node
+import purify
+
+from mwlib import wiki
+
 
 class TimeoutException(Exception):
+    """ Used for debugging
+    Sometimes the workers would freeze up"""
     pass
 
-_nextid = 0
-def make_entry(name):
-    global _nextid
-    e = [_nextid, name, None, []]
-    _nextid += 1
-    return e #[id, name, gml, sections]
+class Article:
+    _nextid = 0
+    def __init__(self, name):
+        self.id = Article._nextid
+        Article._nextid += 1
+        self.name = name.encode('utf-8')
+        self.gml = u''
+        self.sections = []
 
-_seg_id = 101
-_art_id = 100
-def write_segment(outdir, entries):
-    global _art_id
-    global _seg_id
-
-    f =  gzip.open(os.path.join(outdir, '{0:05}'.format(_seg_id) + '.gml.gz'), 'wb')
-    for e in entries:
+def write_segment(outdir, articles):
+    f = gzip.open(os.path.join(outdir, '{0:05}'.format(write_segment.seg_id) + '.gml.gz'), 'wb')
+    for article in articles:
         sent_id = 0
-        if e[2] and e[2].strip():
-            for line in e[2].splitlines():
+        if article.gml and article.gml.strip():
+            for line in article.gml.splitlines():
                 line = gml.re_par.sub('\n', line)
-                line = line.replace('___NL___', '') #only insert paragraph breaks at the end of a sentence
-                f.write('[1{0:07}{1:05}] |{2}\n'.format(_art_id, sent_id, line.encode('utf-8')))
+                line = line.replace('___NL___', '')  # only insert paragraph breaks at the end of a sentence
+                f.write('[1{0:07}{1:05}] |{2}\n'.format(write_segment.art_id, sent_id, line.encode('utf-8')))
                 sent_id += 10
-            _art_id += 1
-        e[2] = None
-    _seg_id += 1
-                        
+            write_segment.art_id += 1
+        article.gml = None
+    write_segment.seg_id += 1
+
+# starting point for WikiWoods 1.0/2.0
+write_segment.seg_id = 101
+write_segment.art_id = 100
+
+
+
 def worker(outdir, inqueue, outqueue,
-           order, clean_port, dirty_port, 
-           prerocessor, gml_purifier, senseg_purifier):
+           order, clean_port, dirty_port,
+           preprocessor, gml_purifier, senseg_purifier):
     clean_client = srilm.Client(clean_port, order)
     dirty_client = srilm.Client(dirty_port, order)
+
+    logger = log.getLogger(__name__)
 
     def timeout_handler(signum, fram):
         raise TimeoutException()
     signal.signal(signal.SIGALRM, timeout_handler)
 
-
-
     done = False
     while not done:
         try:
-            #signal.alarm(3600) #somethimes the workers freeze up...
-            #get 100 entries
-            entries = collections.deque([])
+            # signal.alarm(3600) #somethimes the workers freeze up...
+            # get 100 entries
+            articles = collections.deque([])
             i = 0
-            try: 
+            try:
                 while i < 100:
-                    entry = inqueue.get(True, 1)
-                    entries.append(entry)
+                    article = inqueue.get(True, 1)
+                    articles.append(article)
                     i += 1
-            except Queue.Empty as excp:
+            except Queue.Empty as excp: # we're done when the queue is emtpy
                 done = True
             sections = collections.deque([])
-            for e in entries:
-                e[3] = preprocessor.parse_and_purify(e[1])
-                sections.extend(e[3])
+            for article in articles:
+                article.sections = preprocessor.parse_and_purify(article.name)
+                sections.extend(article.sections)
             classify.classify(sections, clean_client, dirty_client)
 
-            for e in entries:
-                e[2] = u''
-                for sect in e[3]:
-                    gml.filter_sections(e[3])
-
-                    text = senseg.senseg(senseg_purifier.node2str(sect.tree))
-                    lines = purify.markup_sentences(gml_purifier, sect, re.split('\n+', text), gml.escape)
-
+            for article in articles:
+                gml.filter_sections(article.sections)
+                for sect in article.sections:
                     if sect.clean:
-                        e[2] += '\n'.join(lines) + '\n'
+                        text = senseg.senseg(senseg_purifier.node2str(sect.tree))
+                        lines = purify.markup_sentences(gml_purifier, sect, re.split('\n+', text), gml.escape)
+                        article.gml += '\n'.join(lines) + '\n'
                     elif sect.sprint:
-                        if lines and lines[0]:
-                            e[2] += lines[0] + '\n'
-                if e[2]:
-                    e[2] = gml.fix_templates(e[2])
-                else:
-                    e[2] = u'' # this should not be necessary
-                e[3] = None
-                outqueue.put(e)
+                        article.gml += gml_purifier.markup_heading(sect) + '\n'
+
+                if article.gml:
+                    article.gml = gml.fix_templates(article.gml)
+                article.sections = None
+                outqueue.put(article)
 
         except Exception as excp:
             msg = repr(excp)
-            log.logger.error(msg.encode("utf-8", "ignore"))
-            log.logger.error(traceback.format_exc())
-            if entries:
-                for e in entries:
-                    e[3] = None
-                    if not e[2]:
-                        e[2] = u''
-                    outqueue.put(e)
+            logger.error(msg.encode("utf-8", "ignore"))
+            logger.error(traceback.format_exc())
+            if articles:
+                for article in articles:
+                    article.sections = None
+                    if not article.gml:
+                        article.gml = u''
+                    outqueue.put(article)
             clean_client.close()
             dirty_client.close()
             clean_client = srilm.Client(clean_port, order)
             dirty_client = srilm.Client(dirty_port, order)
 
-
-
     signal.alarm(0)
     clean_client.close()
     dirty_client.close()
-    outqueue.put(None) # tell the main process that we are done
+    outqueue.put(None)  # tell the main process that we are done
 
 
 if __name__ == "__main__":
@@ -126,6 +144,7 @@ if __name__ == "__main__":
     parser.add_argument('--blacklist', '-b', help="do not include the articles listed in this file")
     args = parser.parse_args()
 
+    logger = log.getLogger(__name__)
 
 
     blacklist = []
@@ -135,85 +154,81 @@ if __name__ == "__main__":
             if line:
                 blacklist.append(line)
 
-    #read the articles
+    # get a list of article names
     if args.article_list:
         names = []
         with codecs.open(args.article_list, 'r', 'utf-8') as f:
             for name in f:
                 names.append(name.strip())
-        names.sort()
-        entries = [make_entry(n) for n in names if not n in blacklist]
     else:
         names = list_articles.articles()
-        names.sort()
-        entries = [make_entry(n) for n in names if not n in blacklist]
-    names = multiprocessing.Queue()
 
-    #entries = list(entries)
-    #entries.sort(key=lambda e:e.name)
-    for e in entries:
+    names.sort()
+    articles = [Article(n) for n in names if not n in blacklist]
+
+    names = multiprocessing.Queue()
+    for e in articles:
         names.put(e)
 
     env = wiki.makewiki(paths.paths["wikiconf"])
     act = template.create_actions(env, paths.paths["templaterules"], paths.paths["templatecache"])
 
-    #classifier
+    # classifier
     order = srilm.max_order(paths.paths["clean lm"])
     clean = srilm.Server(args.clean_port, paths.paths["clean lm"])
     dirty = srilm.Server(args.dirty_port, paths.paths["dirty lm"])
     preprocessor = classify.Preprocessor(env, act, node.read_rules(paths.paths["noderules"]))
-    #gml
+    # gml
     gml_purifier = purify.Purifier(env, act, node.read_rules(paths.paths["noderules_gml"]))
-    #senseg
+    # senseg
     senseg_purifier = purify.Purifier(env, act, node.read_rules(paths.paths["noderules_senseg"]))
     senseg_purifier.extra_newlines = True
 
-    
-
-   #start worker processes
-    ret = multiprocessing.Queue()
-    log.logger.info("starting workers")
+    ret = multiprocessing.Queue() # the processed articles returned from worker()
+    logger.info("starting workers")
     for i in range(0, args.processes):
         p = multiprocessing.Process(target=worker, name=str(i), args=(args.out_dir, names, ret,
-                                                                      order, args.clean_port, args.dirty_port, 
-                                                                      preprocessor, gml_purifier, senseg_purifier,
-                                                                      ))            
+                                                                      order, args.clean_port, args.dirty_port,
+                                                                      preprocessor, gml_purifier, senseg_purifier))
         p.daemon = True
         p.start()
 
-    #collect the finished text
+    # collect the finished text
     curr_pcs = args.processes
-    saved = 0#first non-saved
-    processed = 0#first non-processed 
-    ready = 0#entries that can be written to disk
+    saved = 0  # idx of first non-saved
+    processed = 0  # idx of first non-processed
+    ready = 0  # entries that can be written to disk
+
+    articles = [None] * len(articles)
 
     i = 0
     while curr_pcs > 0:
-        entry = ret.get()
-        if not entry:
+        article = ret.get()
+        if not article:
             curr_pcs -= 1
         else:
-            entries[entry[0]] = entry
+            articles[article.id] = article
 
             if i % 1000 == 0:
-                log.logger.info(str(entry[0]) + " id (" + str(ready) + " ready)")
+                logger.debug("latest article: " + str(article.id) + " (" + str(ready) + " ready)")
 
-            while processed < len(entries) and entries[processed][2] != None:
-                if entries[processed][2].strip():
-                    if not u'⌊δ' in entries[processed][2]:
-                        log.logger.error("Missing fist line of " + entries[processed][1])
+            while processed < len(articles) and articles[processed] != None:
+                if articles[processed].gml.strip():
+                    # simple sanity check, all articles must have a top level heading
+                    if not u'⌊δ' in articles[processed].gml:
+                        logger.error("Missing fist line of " + articles[processed].name)
                     ready += 1
                 processed += 1
 
                 if ready == 100:
                     ready = 0
-                    write_segment(args.out_dir, entries[saved:processed])
+                    write_segment(args.out_dir, articles[saved:processed])
                     saved = processed
 
         i += 1
-
-
-    if saved < len(entries):
-        write_segment(args.out_dir, entries[saved:])
+    # add the remaining articles to the corpus
+    if saved < len(articles):
+        write_segment(args.out_dir, articles[saved:])
+    #shut down the n-gram servers
     clean.stop()
     dirty.stop()
