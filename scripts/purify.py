@@ -425,6 +425,16 @@ class Purifier(object):
 
         return res
 
+    def markup_heading(self, pure_section):
+        """Returns a marked up section heading"""
+        heading = self.elementrules.node_start(pure_section.tree) + pure_section.title + self.elementrules.node_end(pure_section.tree)
+        return heading.replace('\n', '')
+
+    def markup(self, pure_section):
+        """Returns a marked up section"""
+        return self._node2str(pure_section.tree)
+
+
     def node2str(self, n):
         return self._node2str(n)
 
