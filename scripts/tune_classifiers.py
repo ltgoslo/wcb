@@ -6,8 +6,14 @@
 # Lars J|rgen Solberg <larsjsol@sh.titan.uio.no> 2012
 #
 
-import argparse, os, time, shutil, profile
-import log, srilm, util, classifier_cache
+import argparse
+import os
+import time
+
+from wcb import log
+from wcb import srilm
+from wcb import util
+from wcb import classifier_cache
 
 
 if __name__ == "__main__":
@@ -18,7 +24,7 @@ if __name__ == "__main__":
     parser.add_argument('--clean-port', default='5000')
     parser.add_argument('--dirty-port', default='5001')
     parser.add_argument('--articles', '-a', action='store_true', default=False)
-    
+
     args = parser.parse_args()
 
     log.logger.info("loading sets")
@@ -28,7 +34,7 @@ if __name__ == "__main__":
     else:
         clean_sections = [s for s in util.sections(args.clean_set)]
         dirty_sections = [s for s in util.sections(args.dirty_set)]
-    
+
 
     classifiers = util.classifiers(args.lm_dir)
 
@@ -40,19 +46,19 @@ if __name__ == "__main__":
         log.logger.info("classifying (" + str(len(clean_sections) + len(dirty_sections)) + ")")
         clean_results = classifier_cache.read_cache(args.lm_dir, c[0], os.path.basename(args.clean_set))
         dirty_results = classifier_cache.read_cache(args.lm_dir, c[0], os.path.basename(args.dirty_set))
- 
+
         if not (clean_results and dirty_results):
             clean_server = srilm.Server(args.clean_port, os.path.join(args.lm_dir, c[1]), c[3])
             dirty_server = srilm.Server(args.dirty_port, os.path.join(args.lm_dir, c[2]), c[3])
             clean_client = srilm.Client(args.clean_port, c[3])
             dirty_client = srilm.Client(args.dirty_port, c[3])
-            
+
             clean_results = [x for x in srilm.classify_bulk(clean_sections, clean_client, dirty_client)]
             dirty_results = [x for x in srilm.classify_bulk(dirty_sections, clean_client, dirty_client)]
 
             classifier_cache.write_cache(args.lm_dir, c[0], os.path.basename(args.clean_set), clean_results)
             classifier_cache.write_cache(args.lm_dir, c[0], os.path.basename(args.dirty_set), dirty_results)
-            
+
             log.logger.info("stopping servers")
             clean_client.close()
             dirty_client.close()
@@ -65,7 +71,3 @@ if __name__ == "__main__":
         print str(corr) + "\t",
         corr = sum([1 for x in dirty_results if x < 0])
         print str(corr)
-
-
-                    
-

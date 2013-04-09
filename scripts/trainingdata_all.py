@@ -5,10 +5,22 @@
 #
 # Lars J|rgen Solberg <larsjsol@sh.titan.uio.no> 2012
 #
-import argparse, os, csv, random, shutil, codecs, sys, re
-import multiprocessing, logging, Queue, time, traceback, random
-from mwlib import wiki, nshandling, advtree
-import paths, classify, template, node, util, srilm, log
+import argparse
+import os
+import random
+import shutil
+import multiprocessing
+import Queue
+import traceback
+
+from mwlib import wiki, nshandling
+
+import wcb
+from wcb import classify
+from wcb import template
+from wcb import node
+from wcb import log
+
 from trainingdata import write_section
 
 
@@ -17,7 +29,6 @@ _chunk_size = 10000000 #write ~10M characters in each file
 
 def worker(outdir, inqueue, outqueue, purifier):
 
-    env = purifier.env
     buf = ''
     num = 0
 
@@ -29,9 +40,9 @@ def worker(outdir, inqueue, outqueue, purifier):
             sections = purifier.parse_and_purify(name)
             if not sections:
                 continue
-            text = ''.join([s.string for s in sections])            
+            text = ''.join([s.string for s in sections])
 
-            #add the result to our buffers and save them if they are big enough 
+            #add the result to our buffers and save them if they are big enough
             buf += text
             if len(buf) >= _chunk_size:
                 write_section(outdir, buf, num)
@@ -53,18 +64,17 @@ def worker(outdir, inqueue, outqueue, purifier):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Purifies and "explodes" all articles')
-    
+
     parser.add_argument('outdir')
     parser.add_argument('--processes', '-p', type=int, default=1)
     parser.add_argument('--max', '-m', type=int, help="get no more than this many articles")
     args = parser.parse_args()
-    
 
-    
-    env = wiki.makewiki(paths.paths["wikiconf"])
-    act = template.create_actions(env, paths.paths["templaterules"], paths.paths["templatecache"])
-    elementrules = node.read_rules(paths.paths["noderules"])
-    #elementrules = multiprocessing.Manager().dict(node.read_rules(paths.paths["noderules"]))
+
+
+    env = wiki.makewiki(wcb.paths["wikiconf"])
+    act = template.create_actions(env, wcb.paths["templaterules"], wcb.paths["templatecache"])
+    elementrules = node.read_rules(wcb.paths["noderules"])
 
     purifier = classify.Preprocessor(env, act, elementrules)
 
@@ -88,7 +98,7 @@ if __name__ == "__main__":
     random.shuffle(l)
     for n in l:
         names.put(n)
-        
+
 
 
     #start worker processes
@@ -108,5 +118,3 @@ if __name__ == "__main__":
 
 
     log.logger.info("Done")
-
-        
