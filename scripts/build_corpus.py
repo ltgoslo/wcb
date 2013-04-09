@@ -46,7 +46,22 @@ class Article:
         self.gml = u''
         self.sections = []
 
+
+def readfile_wm(filename):
+    """ Returns the wiki markup and article name from a file as a tuple """
+    with codecs.open(filename, 'r', 'utf-8') as f:
+        title = readfile_wm.re_article_tag.sub('', f.readline().strip())
+        content = u''
+        line = f.readline()
+        while line:
+            content += line
+            line = f.readline()
+    return content, title
+readfile_wm.re_article_tag = re.compile(r'</?article>', re.U)
+
+
 def write_segment(outdir, articles):
+    """ Writes the gml in 'articles' to disk """
     f = gzip.open(os.path.join(outdir, '{0:05}'.format(write_segment.seg_id) + '.gml.gz'), 'wb')
     for article in articles:
         sent_id = 0
@@ -68,13 +83,14 @@ write_segment.art_id = 100
 
 def worker(outdir, inqueue, outqueue,
            order, clean_port, dirty_port,
-           preprocessor, gml_purifier, senseg_purifier):
+           preprocessor, gml_purifier,
+           senseg_purifier, plain_files):
     clean_client = srilm.Client(clean_port, order)
     dirty_client = srilm.Client(dirty_port, order)
 
     logger = log.getLogger(__name__)
 
-    def timeout_handler(signum, fram):
+    def timeout_handler(signum, frame):
         raise TimeoutException()
     signal.signal(signal.SIGALRM, timeout_handler)
 
@@ -94,7 +110,11 @@ def worker(outdir, inqueue, outqueue,
                 done = True
             sections = collections.deque([])
             for article in articles:
-                article.sections = preprocessor.parse_and_purify(article.name)
+                if plain_files:
+                    w_markup, name = readfile_wm(article.name)
+                    article.sections = preprocessor.purify_string(w_markup, name)
+                else:
+                    article.sections = preprocessor.parse_and_purify(article.name)
                 sections.extend(article.sections)
             classify.classify(sections, clean_client, dirty_client)
 
@@ -137,11 +157,14 @@ def worker(outdir, inqueue, outqueue,
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('out_dir')
-    parser.add_argument('--article-list', '-a', help='only include the articles listed in this file')
     parser.add_argument('--clean-port', '-c', default='5000', help='which port should the "clean" model bind to (default: 5000)')
     parser.add_argument('--dirty-port', '-d', default='5001', help='which port should the "dirty" model bind to (default: 5001)')
     parser.add_argument('--processes', '-p', default=1, type=int, help="run this many processes in parallel (default: 1)")
     parser.add_argument('--blacklist', '-b', help="do not include the articles listed in this file")
+    lst_grp = parser.add_mutually_exclusive_group()
+    lst_grp.add_argument('--article-list', '-a', help='only include the articles listed in this file')
+    lst_grp.add_argument('--file-list', '-f', help='list of plain files to be used instead of a dump')
+
     args = parser.parse_args()
 
     logger = log.getLogger(__name__)
@@ -155,9 +178,10 @@ if __name__ == "__main__":
                 blacklist.append(line)
 
     # get a list of article names
-    if args.article_list:
+    if args.article_list or args.file_list:
+        filename = args.article_list if args.article_list else args.file_list
         names = []
-        with codecs.open(args.article_list, 'r', 'utf-8') as f:
+        with codecs.open(filename, 'r', 'utf-8') as f:
             for name in f:
                 names.append(name.strip())
     else:
@@ -173,7 +197,7 @@ if __name__ == "__main__":
     env = wiki.makewiki(paths.paths["wikiconf"])
     act = template.create_actions(env, paths.paths["templaterules"], paths.paths["templatecache"])
 
-    # classifier
+    # the classifier
     order = srilm.max_order(paths.paths["clean lm"])
     clean = srilm.Server(args.clean_port, paths.paths["clean lm"])
     dirty = srilm.Server(args.dirty_port, paths.paths["dirty lm"])
@@ -188,8 +212,10 @@ if __name__ == "__main__":
     logger.info("starting workers")
     for i in range(0, args.processes):
         p = multiprocessing.Process(target=worker, name=str(i), args=(args.out_dir, names, ret,
-                                                                      order, args.clean_port, args.dirty_port,
-                                                                      preprocessor, gml_purifier, senseg_purifier))
+                                                                      order, args.clean_port,
+                                                                      args.dirty_port,
+                                                                      preprocessor, gml_purifier,
+                                                                      senseg_purifier, args.file_list))
         p.daemon = True
         p.start()
 
