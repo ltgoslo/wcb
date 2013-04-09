@@ -6,8 +6,11 @@
 # Lars J|rgen Solberg <larsjsol@sh.titan.uio.no> 2012
 #
 
-import log, srilm
-import argparse, os, glob
+from wcb import srilm
+
+import argparse
+import os
+import glob
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -21,7 +24,7 @@ if __name__ == "__main__":
     train = [t[6:] for t in glob.iglob('clean_*.exploded')]
     print train
     os.chdir(pwd)
-    
+
     pr_train = ['10', '20', '50', '100']
     smooth = ['-kndiscount', '-ukndiscount', '-cdiscount 1', '-addsmooth 1', '-wbdiscount']
 
@@ -36,7 +39,7 @@ if __name__ == "__main__":
                                       order=int(o),
                                       args=s.split())
 
-    #only make 15 grams with cdiscount                              
+    #only make 15 grams with cdiscount
     order = ['15']
     smooth = ['-cdiscount 1']
     for o in order:

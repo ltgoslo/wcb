@@ -6,7 +6,9 @@
 # Lars J|rgen Solberg <larsjsol@sh.titan.uio.no> 2012
 #
 
-import argparse, csv, time, codecs, re
+import argparse
+import csv
+import re
 
 #subtract this from the template id to get its position in rows
 R_OFFSET = 103
@@ -19,25 +21,6 @@ def count(ids):
     for id in ids:
         s += rows[id - R_OFFSET][0]
     return s
-
-
-def checknode(node, res, prefix):
-    """
-    Creates a dict with parts of template names and the ids of the matching
-    templates.
-    """
-    if len(node.ids) > 5 or isinstance(node, suffix_tree.RootNode):
-        s = prefix + re.sub(r'\$\d*$', '$', node.string)
-
-        if len(s) > 4:
-            if s in res:
-                res[s].update(node.ids)
-            else:
-                res[s] = node.ids
-
-        if not '$' in node.string:
-            for c in node.children:
-                checknode(c, res, s)
 
 def printres(l):
     """
@@ -52,34 +35,12 @@ def printres(l):
 
     out.close()
 
-def collapse(l):
-    """
-    Merge the elements in l that consists of the same templates.
-    """
-    count = 0
-    string = 1
-    ids = 2
-    pre = l[0]
-
-    res = []
-    for r in l[1:]:
-        #we are not interested in induvidual templates
-
-        if pre[ids] == r[ids]:
-            if len(r[string]) >  len(pre[string]): 
-                pre[string] = r[string]
-        else:
-            res.append(pre)
-            pre = r    
-    
-    return res
-
 def complements(l):
     """
-    Reduce the set of matching templates so each template is only counted once. 
+    Reduce the set of matching templates so each template is only counted once.
 
-    I.e it makes sure that the template sets for 'information' and 'box' 
-    are disjunkt.
+    I.e it makes sure that the template sets for 'information' and 'box'
+    are disjunct.
     """
     res = []
     seen = [False]*len(rows)
@@ -104,7 +65,7 @@ if __name__ == "__main__":
     parser.add_argument('outfile')
     parser.add_argument('--skip', help="ignore the SKIP most used templates", type=int, default=0)
     args = parser.parse_args()
-    
+
     #read template-list
     rows = []
     f = open(args.templatelist, 'rb')
@@ -145,10 +106,10 @@ if __name__ == "__main__":
             l.append([count(res[k]), k, res[k]])
     #sort it
     l.sort(key=lambda x: x[0], reverse=True)
-    #make each set disjunkt
+    #make each set disjunct
     l = complements(l)
 
-    
+
     l.sort(key=lambda x: x[0], reverse=True)
     print "Saving results"
     printres(l)

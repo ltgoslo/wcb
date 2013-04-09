@@ -7,7 +7,8 @@
 #
 
 import argparse
-import srilm, util
+from wcb import srilm
+from wcb import util
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

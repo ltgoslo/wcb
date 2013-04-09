@@ -13,25 +13,22 @@ import wcb
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser(description='Prints the syntax tree of an article')
-    argparser.add_argument('article', nargs='?', default=None, help="name of article")
-    argparser.add_argument('--file', '-f', default=None, type=str, help="parse FILE")
     argparser.add_argument('--advanced', '-a', action='store_true', help="Convert to advtree")
+    argparser.add_argument('article')
+    argparser.add_argument('--file', '-f', action='store_true', help="read article from FILE")
     args = argparser.parse_args()
 
     env = wiki.makewiki(wcb.paths["wikiconf"])
 
     if args.file:
         try:
-            f = codecs.open(args.file, encoding='utf-8')
+            f = codecs.open(args.article, encoding='utf-8')
             raw = f.read()
-        except Exception as excp:
+        except ValueError as excp:
             sys.exit(unicode(excp).encode("ascii", "backslashreplace") + "\n")
         tree = uparser.parseString(title='Nameless', raw=raw, wikidb=env.wiki, lang=env.wiki.siteinfo["general"]["lang"])
-    elif args.article:
-        tree = env.wiki.getParsedArticle(args.article)
     else:
-        argparser.print_help()
-        exit(-1)
+        tree = env.wiki.getParsedArticle(args.article)
 
     if tree:
         if args.advanced:

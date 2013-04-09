@@ -6,9 +6,23 @@
 # Lars J|rgen Solberg <larsjsol@sh.titan.uio.no> 2012
 #
 
-import argparse, sys, time, multiprocessing, traceback, Queue
-import paths, template, classify, node, myParseString, util, log, list_articles
-from mwlib import wiki, nshandling, advtree
+import argparse
+import multiprocessing
+import traceback
+import Queue
+
+import wcb
+from wcb import template
+from wcb import classify
+from wcb import node
+from wcb import myParseString
+from wcb import util
+from wcb import log
+
+from mwlib import wiki
+from mwlib import nshandling
+from mwlib import advtree
+import mwlib.templ # 'cold-importing' mwlib.templ.evaluate throws an ImportError
 from mwlib.templ import evaluate
 
 
@@ -22,7 +36,7 @@ def worker(q, names, templr, noder):
 
     articles = 0
     skipped = 0
-    
+
     while True:
         try:
             name = names.get(True, 1)
@@ -32,8 +46,8 @@ def worker(q, names, templr, noder):
                 #ignore redirects
                 if not rm(raw):
                     raw = templr.handle_templates(raw, title=name)
-                    tree = myParseString.myParseString(title=name, raw=raw, wikidb=env.wiki, 
-                                                       lang=env.wiki.siteinfo["general"]["lang"], 
+                    tree = myParseString.myParseString(title=name, raw=raw, wikidb=env.wiki,
+                                                       lang=env.wiki.siteinfo["general"]["lang"],
                                                        uniq=templr.exp.uniquifier)
                     advtree.buildAdvancedTree(tree)
                     #for all sections in each article
@@ -47,7 +61,7 @@ def worker(q, names, templr, noder):
                 #for skipping a page not in NS_MAIN
                 skipped += 1
         except Queue.Empty as excp:
-            log.logger.info("examined " + str(articles) + " articles, skipped " + str(skipped))                
+            log.logger.info("examined " + str(articles) + " articles, skipped " + str(skipped))
             q.put(None)
             return
         except Exception as excp:
@@ -61,7 +75,7 @@ class Record:
     name = None
     count = 1
     length = 0
-    
+
     def __init__(self, name, length):
         name = name.replace('_', '-')
         self.name = name.replace('\n', ' ')
@@ -69,14 +83,14 @@ class Record:
 
     def __repr__(self):
         return 'Record(' + self.name.encode("utf-8", "ignore") + ', ' + str(self.length) + ')'
-        
-    
+
+
 def printres(results):
     l = results.values()
 
     log.logger.info("Sorting " + str(len(l)) + " headings")
     l.sort(key=lambda x: x.count, reverse=True)
-    
+
     print "name_count_avg length"
     for h in l:
         row = h.name.encode("utf-8", "ignore") + "_"
@@ -86,31 +100,30 @@ def printres(results):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    
     parser.add_argument('--processes', '-p', type=int, default=1)
     parser.add_argument('--max', '-m', type=int, help="dont process more than this many pages")
     args = parser.parse_args()
-    
 
-    env = wiki.makewiki(paths.paths["wikiconf"])
-    templr = template.create_actions(env, paths.paths["templaterules"], paths.paths["templatecache"])
-    noder = node.read_rules(paths.paths["noderules"])
+
+    env = wiki.makewiki(wcb.paths["wikiconf"])
+    templr = template.create_actions(env, wcb.paths["templaterules"], wcb.paths["templatecache"])
+    noder = node.read_rules(wcb.paths["noderules"])
 
 
     log.logger.info("Listing articles")
     names = multiprocessing.Queue()
-    
+
     if not args.max:
         args.max = len(env.wiki.reader.keys())
 
     i = 0
-    for n in list_articles.articles():
+    for n in util.articles():
         if i < args.max:
             names.put(n)
             i += 1
         else:
             break
-    
+
     #start the worker processes
     q = multiprocessing.Queue()
     log.logger.info("Starting workers")
@@ -135,6 +148,6 @@ if __name__ == "__main__":
                 res[r.name].length += r.length
             else:
                 res[r.name] = r
- 
+
     printres(res)
     log.logger.info("Done")

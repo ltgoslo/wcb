@@ -6,8 +6,15 @@
 # Lars J|rgen Solberg <larsjsol@sh.titan.uio.no> 2012
 #
 
-import argparse, time, os
-import util, srilm, log, classifier_cache
+import argparse
+import time
+import os
+
+from wcb import util
+from wcb import srilm
+from wcb import log
+from wcb import classifier_cache
+
 import scipy.stats
 
 if __name__ == "__main__":
@@ -31,10 +38,10 @@ if __name__ == "__main__":
         clean_sections = [s for s in util.sections(args.clean_set)]
         dirty_sections = [s for s in util.sections(args.dirty_set)]
 
-    log.logger.info(str(len(clean_sections)) + " + " + str(len(dirty_sections)) + " sections") 
+    log.logger.info(str(len(clean_sections)) + " + " + str(len(dirty_sections)) + " sections")
     #classifiers = [('test', 'clean_2gram_10train_cdiscount_1.lm', 'dirty_2gram_10train_cdiscount_1.lm', 2)]
     classifiers = util.classifiers(args.lm_dir)
-    
+
     #how many sections does the target classifier get right?
     log.logger.debug("loading the target classifier")
     order = srilm.max_order(args.clean_lm)
@@ -61,21 +68,21 @@ if __name__ == "__main__":
 
         outcomes = [1 if r > 0 else 0 for r in classifier_cache.read_cache(args.lm_dir, c[0], os.path.basename(args.clean_set))]
         outcomes += [1 if r < 0 else 0 for r in classifier_cache.read_cache(args.lm_dir, c[0], os.path.basename(args.dirty_set))]
-        
+
         if not outcomes:
         #load the classifier
             clean_server = srilm.Server(args.clean_port, os.path.join(args.lm_dir, c[1]), c[3])
             dirty_server = srilm.Server(args.dirty_port, os.path.join(args.lm_dir, c[2]), c[3])
             clean_client = srilm.Client(args.clean_port, c[3])
             dirty_client = srilm.Client(args.dirty_port, c[3])
-        
+
         #find which sections it get right
             clean_results = srilm.classify_bulk(clean_sections, clean_client, dirty_client)
             dirty_results = srilm.classify_bulk(dirty_sections, clean_client, dirty_client)
             classifier_cache.write_cache(args.lm_dir, c[0], os.path.basename(args.clean_set), clean_results)
             classifier_cache.write_cache(args.lm_dir, c[0], os.path.basename(args.dirty_set), dirty_results)
 
-            
+
             outcomes = [1 if r > 0 else 0 for r in clean_results]
             outcomes += [1 if r < 0 else 0 for r in dirty_results]
 
@@ -84,7 +91,7 @@ if __name__ == "__main__":
             clean_server.stop()
             dirty_server.stop()
             time.sleep(30)
-        
+
         m = 0
         w = 0
         for x, y in zip(target_outcomes, outcomes):
@@ -100,5 +107,5 @@ if __name__ == "__main__":
             siglvl += '*'
         if sig <= 0.005:
             siglvl += '*'
-            
+
         print "%s\t%.10f\t%s\t%i\t%i" % (c[0], sig, siglvl, m, w)

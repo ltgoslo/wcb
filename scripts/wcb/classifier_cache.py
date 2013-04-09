@@ -5,9 +5,10 @@
 #
 # Lars J|rgen Solberg <larsjsol@sh.titan.uio.no> 2012
 #
+import log
 
-import util, log
-import collections, os
+import collections
+import os
 
 def write_cache(lm_dir, label, set_name, results):
     if not is_cached(lm_dir, label, set_name):
@@ -28,7 +29,7 @@ def read_cache(lm_dir, label, set_name):
                 results.append(float(r))
 
     return results
-    
+
 
 
 def filename(lm_dir, label, set_name):
