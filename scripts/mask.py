@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  $Id$
 #
-# Lars J|rgen Solberg <larsjsol@sh.titan.uio.no> 2012
+# Lars Jørgen Solberg <supersolberg@gmail.com> 2013
 #
 
 import re, cPickle, os, argparse
