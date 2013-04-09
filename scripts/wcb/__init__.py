@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  $Id$
 #
-# Lars Jørgen Solberg <larsso@plundre.megalol.be> 2013
+# Lars Jørgen Solberg <supersolberg@gmail.com> 2013
 #
 import os
 

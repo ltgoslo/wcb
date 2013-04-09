@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
+#
+# Lars Jørgen Solberg <supersolberg@gmail.com> 2013
+#
 
 
 from mwlib import wiki, parser

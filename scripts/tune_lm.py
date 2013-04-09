@@ -1,8 +1,8 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
-#  $Id$
 #
-# 2012 by Lars J|rgen Solberg <larsjsol@sh.titan.uio.no>
+# Lars Jørgen Solberg <supersolberg@gmail.com> 2013
 #
 
 import os

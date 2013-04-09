@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  $Id$
 #
-# Lars Jrgen Solberg <larsso@conan.megalol.be> 2012
+# Lars Jørgen Solberg <supersolberg@gmail.com> 2013
 #
 from mwlib import wiki, nshandling, expander, uniq
 from mwlib.templ import parser, nodes, evaluate
