@@ -12,7 +12,7 @@ from mwlib import parser, nshandling
 
 import sys, locale, argparse, re, collections, string
 
-import template, node, myParseString, myUniquifier, paths
+import template, node, myParseString, myUniquifier
 import util, log
 
 logger = log.getLogger(__name__)
@@ -44,18 +44,18 @@ class Token:
     def __init__(self, node, start):
         self.node = node
         self.start = start
-        
+
     def __repr__(self):
         return 'Token(' + self.node.__class__.__name__ + ', ' + repr(self.start) + ')'
 
 
 def markup_sentences(purifier, puresection, sentences, escape_function=None):
     res = collections.deque([])
-    
+
     puresection.build_tokens()
     #print repr(puresection.tokens) +  str(id(puresection.tokens))
     rules = purifier.elementrules
-    
+
     token_off = 0
     token_frag = 0
 
@@ -67,13 +67,13 @@ def markup_sentences(purifier, puresection, sentences, escape_function=None):
         sentence = sentence.strip()
         if not sentence:
             continue
-        
+
 
         skip_until = None
         closing = False
         while token_off < len(puresection.tokens):
             t = puresection.tokens[token_off]
-            
+
 
             if skip_until:
                 if isinstance(t, Token) and skip_until == t.node:
@@ -101,9 +101,9 @@ def markup_sentences(purifier, puresection, sentences, escape_function=None):
                     else:
                         token_frag += node_frag
                         break
-                        
 
-                    
+
+
                 else:
                     ac = rules.node_action(t.node)
                     if t.start and closing and ac != node.REPLACE and ac != node.PURGE:
@@ -124,7 +124,7 @@ def markup_sentences(purifier, puresection, sentences, escape_function=None):
                         else:
                             markup += rules.node_params(t.node) + rules.node_end(t.node)
                     #elif ac == node.REMOVE: pass
-                                   
+
             token_off += 1
 
         res.append(markup.replace('\n', ' ').strip())
@@ -149,9 +149,9 @@ def markup_sentences(purifier, puresection, sentences, escape_function=None):
         token_off += 1
     if res:
         res[-1] = res[-1] + markup.replace('\n', ' ').strip()
-            
+
     return res
-            
+
 class AlignmentException(Exception):
     pass
 
@@ -175,10 +175,10 @@ def matchstring(s1, s2):
             #oh oh
             err = '\n' + s1 + '\n' + s2 + '\n' + \
             s1[:off1] + '[' + s1[off1] + ']' + s1[off1:] + '\n' + \
-            s2[:off2] + '[' + s2[off2] + ']' + s2[off2:]  
+            s2[:off2] + '[' + s2[off2] + ']' + s2[off2:]
             err = err.encode('ascii', 'ignore')
             raise AlignmentException(err)
-    
+
     #skip remaining white spaces
     #while off1 < len(s1) and s1[off1] in string.whitespace:
     #    off1 += 1
@@ -190,7 +190,7 @@ def matchstring(s1, s2):
     return (off1, off2)
 
 
-        
+
 
 
 class PureSection(object):
@@ -220,7 +220,7 @@ class PureSection(object):
             else:
                 self.title = u''
         self.heading = purifier.elementrules.node_start(tree) + self.title + purifier.elementrules.node_end(tree)
-        
+
         #the content without <h2>heading</h2>
         self.content = string[len(self.heading) + 1:].strip()
         self.heading = self.heading.replace('\n', '')
@@ -229,7 +229,7 @@ class PureSection(object):
 
     def __str__(self):
         return self.string.encode("utf-8", "ignore")
-        
+
     def __repr__(self):
         return repr(self.tree)
 
@@ -247,7 +247,7 @@ class PureSection(object):
                                 res.append(c)
                         res.extend(self._getNodesByClass(c, theclass))
         return res
-    
+
 
 
     def build_tokens(self, tree=None):
@@ -266,8 +266,8 @@ class PureSection(object):
             else:
                 i += 2
         self.tokens = newtokens
-                
-            
+
+
 
 
     def _build_tokens(self, tree):
@@ -287,7 +287,7 @@ class PureSection(object):
             self.tokens.append(getDisplayText(tree))
             self.tokens.append(Token(tree, False))
         elif isinstance(tree, advtree.AdvancedSection):
-            if tree.children and len(tree.children) > 0: 
+            if tree.children and len(tree.children) > 0:
                 self._build_tokens(tree.children[0])
             self.tokens.append(Token(tree, False))
             for c in tree.children[1:]:
@@ -322,7 +322,7 @@ class Purifier(object):
         self.keep_empty = False # shoud we keep sections with no content?
         self.extra_newlines = False # should we include newlines as hints for a sentence segmentor?
 
-    
+
         super(Purifier, self).__init__()
 
 
@@ -334,7 +334,7 @@ class Purifier(object):
         raw = self.env.wiki.reader[title]
 
         #check for redirect
-        target = self.rm(raw) 
+        target = self.rm(raw)
         if target:
             if follow_redirects:
                 logger.info(title + ' redirects to ' + target)
@@ -342,10 +342,10 @@ class Purifier(object):
             else:
                 return None
 
-        else:    
+        else:
             markup = self.templateactions.handle_templates(raw, title=title)
-            tree = myParseString.myParseString(title=title, raw=markup, wikidb=self.env.wiki, 
-                                               lang=self.env.wiki.siteinfo["general"]["lang"], 
+            tree = myParseString.myParseString(title=title, raw=markup, wikidb=self.env.wiki,
+                                               lang=self.env.wiki.siteinfo["general"]["lang"],
                                                uniq=self.templateactions.exp.uniquifier)
             advtree.buildAdvancedTree(tree)
             return self.purify(tree)
@@ -355,18 +355,18 @@ class Purifier(object):
         parses the string and returns it as a list of PureSections
         """
         markup = self.templateactions.handle_templates(string, title=title)
-        tree = myParseString.myParseString(title=title, raw=markup, wikidb=self.env.wiki, 
-                                           lang=self.env.wiki.siteinfo["general"]["lang"], 
+        tree = myParseString.myParseString(title=title, raw=markup, wikidb=self.env.wiki,
+                                           lang=self.env.wiki.siteinfo["general"]["lang"],
                                            uniq=self.templateactions.exp.uniquifier)
         advtree.buildAdvancedTree(tree)
-        return self.purify(tree)        
-        
+        return self.purify(tree)
+
 
     def purify(self, tree):
         """
         destructively purifies 'tree' and returns it as a list of sections.
         """
-        
+
         sections = []
         self._set_tagnames(tree) # in retrospect, using the _tag attribute might have been a better strategy
         self._collect_sections(tree, sections)
@@ -406,7 +406,7 @@ class Purifier(object):
         if tree.children:
             for c in tree.children:
                 self._collect_sections(c, sections)
-    
+
     #split each section into a separate subtree
     def _split_sections(self, tree):
         if tree.children:
@@ -414,11 +414,11 @@ class Purifier(object):
                 self._split_sections(c)
                 if isinstance(c, advtree.AdvancedSection):
                     tree.removeChild(c)
-                
 
-                        
+
+
     def _purify(self, tree):
-        res = self._node2str(tree) 
+        res = self._node2str(tree)
         if tree.children:
             for c in tree.children:
                 res += self._purify(c)
@@ -448,7 +448,7 @@ class Purifier(object):
         #dont do anything fancy with text nodes
         if isinstance(n, advtree.Text):
             return n.caption
-        
+
 #special treatment for Section and Aricle
         ac = node.node_action(self.elementrules, n)
         if isinstance(n, advtree.Article):
@@ -461,10 +461,10 @@ class Purifier(object):
             if ac != node.PURGE:
                 ret = self.elementrules.node_start(n)
                 if ac != node.REPLACE:
-                    if n.children: 
+                    if n.children:
                         ret += self._node2str(n.children[0])
-                ret += self.elementrules.node_end(n) + '\n'                
-            
+                ret += self.elementrules.node_end(n) + '\n'
+
                 if n.children:
                     for c in n.children[1:]:
                         ret += self._node2str(c)
@@ -508,11 +508,11 @@ class Purifier(object):
             if self.extra_newlines:
                 ret = u'\n' + ret
             ret += u'\n'
-        
+
 
         return ret
-            
-    
+
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -521,7 +521,7 @@ if __name__ == "__main__":
     parser.add_argument('--keep-empty', action='store_true')
     parser.add_argument('article')
     args = parser.parse_args()
-    
+
 
     env = wiki.makewiki(paths.paths["wikiconf"])
     act = template.create_actions(env, paths.paths["templaterules"], paths.paths["templatecache"])
@@ -530,8 +530,8 @@ if __name__ == "__main__":
     purifier = Purifier(env, act, elementrules)
     purifier.extra_newlines = args.extra_newlines
     purifier.keep_empty = args.keep_empty
-   
-    
+
+
     raw = """
 This text is above all the headings
 == Template tests ==
@@ -543,7 +543,7 @@ Pagename: {{PAGENAME}}
 {{Fact}}
 
 "Harvtxt" is a redirect to "Harvard citation"<br />
-{{Harv|Smith|2006| p=25}} 
+{{Harv|Smith|2006| p=25}}
 
 "Cleanup" expands to "Asbox" that should be removed<br />
 {{Cleanup}}
@@ -566,7 +566,7 @@ As opposed to this one
         name = page.names[-1]
         markup =  act.handle_templates(raw, title=name)
 
-    tree = myParseString.myParseString(title=name, raw=markup, wikidb=env.wiki, 
+    tree = myParseString.myParseString(title=name, raw=markup, wikidb=env.wiki,
                                        lang=env.wiki.siteinfo["general"]["lang"], uniq=act.exp.uniquifier)
     advtree.buildAdvancedTree(tree)
 

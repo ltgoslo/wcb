@@ -7,9 +7,9 @@
 #
 
 import re, cPickle, os, argparse
-import log, util
 
-from purify import *
+from wcb import log, util
+from wcb.purify import *
 
 _offset = ord('a')
 
@@ -29,7 +29,7 @@ def dec_base25(s):
         res *= 25
         res += ord(char) - _offset
     return res
-    
+
 
 
 class Masker(object):
@@ -42,7 +42,7 @@ class Masker(object):
         self.mask_pattern = None
         self.id = 0
         self.items = []
-        
+
     def store_item(self, item):
         self.items.append(item.group(0))
         mask = self.start + enc_base25(self.id) + self.end
@@ -50,8 +50,8 @@ class Masker(object):
         return mask
 
     def store_string(self, string):
-        if self.start in string: 
-            raise Exception('Masks are nesting!! ' + string) 
+        if self.start in string:
+            raise Exception('Masks are nesting!! ' + string)
         self.items.append(string)
         mask = self.start + enc_base25(self.id) + self.end
         self.id += 1
@@ -59,7 +59,7 @@ class Masker(object):
 
     def retrieve_item(self, mask):
         mask = mask.group(0)
-        log.logger.debug('mask: ' + mask) 
+        log.logger.debug('mask: ' + mask)
         try:
             return self.items[dec_base25(mask[len(self.start):-len(self.end)])]
         except Exception as e:
@@ -102,7 +102,7 @@ if __name__ == "__main__":
         masker = Masker(re.compile(args.regexp, re.U|re.I))
     else:
         masker = Masker()
-        
+
     text = util.file2s(args.file)
     if args.load:
         load_masks(masker, args.masks)
@@ -111,5 +111,3 @@ if __name__ == "__main__":
         text = masker.mask(text)
         save_masks(masker, args.masks)
         util.s2file(text, args.file)
-        
-    

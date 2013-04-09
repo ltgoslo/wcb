@@ -6,9 +6,17 @@
 # Lars J|rgen Solberg <larsjsol@sh.titan.uio.no> 2012
 #
 
-import util, log, purify, template, classify
-import node, paths
-import argparse, collections, re
+from wcb import util
+from wcb import log
+from wcb import purify
+from wcb import template
+from wcb import classify
+from wcb import node
+
+import argparse
+import collections
+import re
+
 from mwlib import wiki
 
 re_fix_enum = re.compile(r'^((\d+\.)|(\w\.))[ \t]*\n', re.U|re.M)
@@ -22,7 +30,7 @@ def senseg(string):
 
     # fix false positives like "1.\nFoo\n2.\Bar
     out = re_fix_enum.sub(r'\1 ', out)
-    # fix lone periods 
+    # fix lone periods
     #out = re_fix_period.sub(r'\n\1 ', out)
 
     return out
@@ -34,7 +42,6 @@ def senseg_sections(senseg_purifier, ml_purifier, sections, escape_funtion=lambd
     for s in sections:
         text = senseg(senseg_purifier.node2str(s.tree))
         res.extend(purify.markup_sentences(ml_purifier, s, re.split('\n+', text), escape_funtion))
-        #res.append(text)
     return res
 
 
@@ -44,11 +51,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
 
-    env = wiki.makewiki(paths.paths["wikiconf"])
-    act = template.create_actions(env, paths.paths["templaterules"], paths.paths["templatecache"])
-    
+    env = wiki.makewiki(wcb.paths["wikiconf"])
+    act = template.create_actions(env, wcb.paths["templaterules"], wcb.paths["templatecache"])
+
     #classifiy sections
-    preprocessor = classify.Preprocessor(env, act, node.read_rules(paths.paths["noderules"]))
+    preprocessor = classify.Preprocessor(env, act, node.read_rules(wcb.paths["noderules"]))
     sections = preprocessor.parse_and_purify(args.article)
     clean,dirty = classify.classify(sections)
 
@@ -56,11 +63,11 @@ if __name__ == "__main__":
     log.logger.debug('dirty sections: ' + ', '.join([s.title for s in dirty]))
 
     #senseg
-    senseg_purifier = purify.Purifier(env, act, node.read_rules(paths.paths["noderules_senseg"]))
+    senseg_purifier = purify.Purifier(env, act, node.read_rules(wcb.paths["noderules_senseg"]))
     senseg_purifier.extra_newlines = True
 
     #gml
-    gml_purifier = purify.Purifier(env, act, node.read_rules(paths.paths["noderules_gml"]))
+    gml_purifier = purify.Purifier(env, act, node.read_rules(wcb.paths["noderules_gml"]))
 
     for s in senseg_sections(senseg_purifier, gml_purifier, clean):
         print s

@@ -3,10 +3,13 @@
 
 
 from mwlib import wiki, uparser
-from mwlib.parser import nodes
 from mwlib import advtree, parser
-import argparse, codecs, sys
-import util, paths
+
+import argparse
+import codecs
+import sys
+
+import wcb
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser(description='Prints the syntax tree of an article')
@@ -15,7 +18,7 @@ if __name__ == "__main__":
     argparser.add_argument('--advanced', '-a', action='store_true', help="Convert to advtree")
     args = argparser.parse_args()
 
-    env = wiki.makewiki(paths.paths["wikiconf"])
+    env = wiki.makewiki(wcb.paths["wikiconf"])
 
     if args.file:
         try:
@@ -30,9 +33,9 @@ if __name__ == "__main__":
         argparser.print_help()
         exit(-1)
 
-    if tree: 
+    if tree:
         if args.advanced:
-            advtree.buildAdvancedTree(tree)   
+            advtree.buildAdvancedTree(tree)
         parser.show(sys.stdout, tree, 0)
     else:
         print 'Could not find article "' + args.article + '"'

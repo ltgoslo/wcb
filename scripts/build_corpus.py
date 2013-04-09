@@ -17,17 +17,16 @@ import re
 import gzip
 import signal
 
-import gml
-import senseg
-import classify
-import paths
-import util
-import srilm
-import log
-import list_articles
-import template
-import node
-import purify
+import wcb
+from wcb import gml
+from wcb import senseg
+from wcb import classify
+from wcb import util
+from wcb import srilm
+from wcb import log
+from wcb import template
+from wcb import node
+from wcb import purify
 
 from mwlib import wiki
 
@@ -185,7 +184,7 @@ if __name__ == "__main__":
             for name in f:
                 names.append(name.strip())
     else:
-        names = list_articles.articles()
+        names = util.articles()
 
     names.sort()
     articles = [Article(n) for n in names if not n in blacklist]
@@ -194,18 +193,18 @@ if __name__ == "__main__":
     for e in articles:
         names.put(e)
 
-    env = wiki.makewiki(paths.paths["wikiconf"])
-    act = template.create_actions(env, paths.paths["templaterules"], paths.paths["templatecache"])
+    env = wiki.makewiki(wcb.paths["wikiconf"])
+    act = template.create_actions(env, wcb.paths["templaterules"], wcb.paths["templatecache"])
 
     # the classifier
-    order = srilm.max_order(paths.paths["clean lm"])
-    clean = srilm.Server(args.clean_port, paths.paths["clean lm"])
-    dirty = srilm.Server(args.dirty_port, paths.paths["dirty lm"])
-    preprocessor = classify.Preprocessor(env, act, node.read_rules(paths.paths["noderules"]))
+    order = srilm.max_order(wcb.paths["clean lm"])
+    clean = srilm.Server(args.clean_port, wcb.paths["clean lm"])
+    dirty = srilm.Server(args.dirty_port, wcb.paths["dirty lm"])
+    preprocessor = classify.Preprocessor(env, act, node.read_rules(wcb.paths["noderules"]))
     # gml
-    gml_purifier = purify.Purifier(env, act, node.read_rules(paths.paths["noderules_gml"]))
+    gml_purifier = purify.Purifier(env, act, node.read_rules(wcb.paths["noderules_gml"]))
     # senseg
-    senseg_purifier = purify.Purifier(env, act, node.read_rules(paths.paths["noderules_senseg"]))
+    senseg_purifier = purify.Purifier(env, act, node.read_rules(wcb.paths["noderules_senseg"]))
     senseg_purifier.extra_newlines = True
 
     ret = multiprocessing.Queue() # the processed articles returned from worker()

@@ -8,7 +8,7 @@
 import argparse, multiprocessing, subprocess, logging
 import os, re, signal, time, socket, string, codecs, atexit
 import inspect, gzip, mimetypes
-import paths, log, util
+import log, util
 
 logger = log.getLogger(__name__)
 

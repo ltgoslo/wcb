@@ -10,7 +10,7 @@ from mwlib.templ import parser, nodes, evaluate
 from mwlib.templ import marks, evaluate, magics
 
 from myTemplate import MyTemplate, mark_argument  # a replacement for mwlib.templ.nodes.Template
-import myUniquifier, myMagic, paths, log
+import myUniquifier, myMagic, log
 
 import csv, sys, re, unicodedata, os, copy
 from collections import deque, Sequence
@@ -32,13 +32,13 @@ def action_code(action):
     """
     Returns EXPAND, REMOVE or KEEP
     """
-    
+
     if isinstance(action, int):
         return action
     else:
         return _action_map[action.strip().lower()]
 
-        
+
 
 
 #template action
@@ -56,8 +56,8 @@ class TemplateActions:
         self.expands = {}
         self.keeps = {}
 
-        
-        
+
+
 
     def __str__(self):
         s = ""
@@ -74,7 +74,7 @@ class TemplateActions:
         """
         Returns the approrpiate action for {{name}}
         """
-        
+
 
         #try to follow redirects and get the right namespace
         name = self.env.wiki.nshandler.get_fqname(name, nshandling.NS_TEMPLATE)
@@ -82,16 +82,16 @@ class TemplateActions:
         try:
             page = self.env.wiki.get_page(name)
         except TypeError as excp:
-            sys.stderr.write("got TypeError: " + str(excp) + " when looking for " + name.encode("utf-8", "ignore") + 
+            sys.stderr.write("got TypeError: " + str(excp) + " when looking for " + name.encode("utf-8", "ignore") +
                              ", name is a " + name.__class__.__name__ + "\n")
             page = None
-                             
+
         if page:
             name = page.names[-1]
         else:
             #remove templates we cant find
             return REMOVE
-        
+
 
         if name in self.removes:
             return REMOVE
@@ -107,7 +107,7 @@ class TemplateActions:
             else:
                 return self.default_action
 
-        
+
     def set_action(self, name, action):
         """
         Sets the action for {{name}}
@@ -143,7 +143,7 @@ class TemplateActions:
     def _update_expander(self, pagename):
         self.exp.resolver = magics.MagicResolver(pagename=pagename)
         self.exp.resolver.siteinfo = self.env.wiki.siteinfo
-        self.exp.resolver.nshandler = self.env.wiki.nshandler 
+        self.exp.resolver.nshandler = self.env.wiki.nshandler
         self.exp.resolver.wikidb = self.env.wiki
         #self.exp.resolver.local_values = local_values
         #self.exp.resolver.source = source
@@ -173,7 +173,7 @@ class TemplateActions:
         ret = []
         self._handle_marks(m, ret)
         logger.debug('cache size: ' + str(len(self.exp.parsedTemplateCache)))
-        
+
         return  self._expand(ret)
 
 
@@ -231,8 +231,8 @@ class TemplateActions:
                 #self._handle_marks(m[i + 1:], res)
                 return i + 1
             i += 1
-                
-            
+
+
     def _keep(self, m, res):
         if len(m) == 0:
             return 0
@@ -264,7 +264,7 @@ class TemplateActions:
 
         offset = i
 
-      
+
         if len(args) > 0:
             res.append(delimiter)
         if newline_start:
@@ -288,7 +288,7 @@ class TemplateActions:
 def expand_rules(env, rules):
     """
     Constructs a TemplateActions from a list of template names/patterns
-    """    
+    """
     act = TemplateActions(env)
     all = []
     for n in env.wiki.reader.iterkeys():
@@ -299,7 +299,7 @@ def expand_rules(env, rules):
                 name = page.names[-1][9:]
                 all.append(name)
             #else this is a broken redirect, not much to do about it
-                
+
     for r in rules:
         #regexp
         if r[0][0] == "/" and r[0][-1] == "/":
@@ -329,10 +329,10 @@ def expand_cached_rules(env, rules):
             act.removes[name] = True
         elif ac == EXPAND:
             act.expands[name] = True
-        
+
     return act
 
-#uses cached rules if possible, creates cache if not                       
+#uses cached rules if possible, creates cache if not
 def create_actions(env, rules, cache):
     if os.path.exists(cache) and os.stat(cache).st_mtime > os.stat(rules).st_mtime:
         logger.info("reading cached rules from: " + cache)
@@ -342,7 +342,7 @@ def create_actions(env, rules, cache):
         act = expand_rules(env, read_rules(rules))
         logger.info("creating cache-file: " + cache)
         write_rules(cache, act)
-    
+
     return act
 
 
@@ -378,13 +378,13 @@ def write_rules(rules_file, actions):
     f.close()
 
 if __name__ == "__main__":
-    env = wiki.makewiki(paths.paths["wikiconf"])
-    rules = create_actions(env, paths.paths["templaterules"], paths.paths["templatecache"])
+    env = wiki.makewiki(wcb.paths["wikiconf"])
+    rules = create_actions(env, wcb.paths["templaterules"], wcb.paths["templatecache"])
 
     markup = env.wiki.nuwiki.get_page('Albert Einstein').rawtext
 
     print rules.handle_templates('\n\n{{flag|China}}\n\n', 'Demo')
-    
+
 
     #print "{{Harvard citation text}} -> ",
     #print rules.get_action("Harvard citation text")
@@ -400,5 +400,3 @@ if __name__ == "__main__":
     #print rules.get_action("IPA")
     #print "{{IPA notice}} -> ",
     #print rules.get_action("IPA notice")
-    
-    

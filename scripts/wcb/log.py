@@ -6,8 +6,8 @@
 # Lars J|rgen Solberg <larsjsol@sh.titan.uio.no> 2012
 #
 
-import multiprocessing, logging, os
-
+import logging
+import os
 
 def getLogger(module):
     logger = logging.getLogger(module)

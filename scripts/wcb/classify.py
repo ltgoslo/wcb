@@ -6,8 +6,11 @@
 # Lars J|rgen Solberg <larsjsol@sh.titan.uio.no> 2012
 #
 
-from purify import *
-import srilm, paths
+import wcb
+from wcb import srilm
+from wcb.purify import *
+
+
 
 class Preprocessor(Purifier):
     def __init__(self, env, templateactions, elementrules):    
@@ -87,10 +90,10 @@ class Preprocessor(Purifier):
 
 def classify(sections, clean_client=None, dirty_client=None, clean_port=5000, dirty_port=5001):
     if not clean_client:
-        clean_server = srilm.Server(clean_port, paths.paths["clean lm"])
+        clean_server = srilm.Server(clean_port, wcb.paths["clean lm"])
         clean_client = srilm.Client(clean_server.port, clean_server.order)
     if not dirty_client:
-        dirty_server = srilm.Server(dirty_port, paths.paths["dirty lm"])
+        dirty_server = srilm.Server(dirty_port, wcb.paths["dirty lm"])
         dirty_client = srilm.Client(dirty_server.port, dirty_server.order)
         
     txt = [srilm.explode(s.string) for s in sections]
@@ -115,9 +118,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
 
-    env = wiki.makewiki(paths.paths["wikiconf"])
-    act = template.create_actions(env, paths.paths["templaterules"], paths.paths["templatecache"])
-    elementrules = node.read_rules(paths.paths["noderules"])
+    env = wiki.makewiki(wcb.paths["wikiconf"])
+    act = template.create_actions(env, wcb.paths["templaterules"], wcb.paths["templatecache"])
+    elementrules = node.read_rules(wcb.paths["noderules"])
 
     purifier = Preprocessor(env, act, elementrules)
 

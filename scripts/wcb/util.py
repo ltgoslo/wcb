@@ -6,36 +6,15 @@
 # Lars J|rgen Solberg <larsjsol@sh.titan.uio.no> 2012
 #
 
-from mwlib import nuwiki, wiki
+from mwlib import nuwiki, wiki, nshandling
 import codecs, re, shlex, subprocess
-import srilm, log, paths, os, glob
+import os, glob
+
+import wcb
+
+import srilm, log
 
 logger = log.getLogger(__name__)
-
-#cdb is no longer supported by mwlib, we use the third party module mwlib.cdb instead
-def wiki_nucdb(path=None, lang="en", **kwargs):
-    from mwlib.cdb import cdbwiki
-    path = os.path.expanduser(path)
-    db=cdbwiki.WikiDB(path, lang=lang)
-    return nuwiki.adapt(db)
-wiki.dispatch = dict(wiki=dict(nucdb=wiki_nucdb))
-
-def normalize_and_get_image_path(x, *args):
-    pass
-nuwiki.adapt.normalize_and_get_image_path = normalize_and_get_image_path
-
-#use the siteinfo.json from paths.txt if present
-def load_siteinfo(lang="en"):
-    from mwlib import siteinfo
-    try:
-        import simplejson as json
-    except ImportError:
-        import json
-
-    if "siteinfo" in paths.paths and os.path.exists(paths.paths["siteinfo"]):
-        siteinfo._cache[lang] = json.load(open(paths.paths["siteinfo"], "rb"))["query"]
-load_siteinfo()
-
 
 def s2file(string, path):
     """writes string to the file path"""
@@ -89,7 +68,7 @@ def exploded_sections(filename):
 
 
 def unexploded_sections(filename):
-    """generator that reads a file and splits it into sections, it strips out sections 
+    """generator that reads a file and splits it into sections, it strips out sections
     delimiters '---...' and the annotator promts '[n] clean/dirty:'"""
     heading = re.compile(r'<h(\d)>.*</h\1>')
     delimiter = '------------------------------------------------------'
@@ -118,12 +97,12 @@ def split(seq, n):
 def classifiers(lm_dir):
     """returns a list of tuples in the form (label, clean_lm, dirty_lm, order)"""
 
-    classifiers = []    
+    classifiers = []
     order = re.compile(r'_(\d+)gram_')
     for clean in glob.iglob(lm_dir + '/clean_*'):
         name = os.path.basename(clean)
         m = order.search(name)
-        
+
         classifiers.append((re.sub(r'\.lm(\.gz)?', '', name[6:]),
                             name,
                             'dirty_' + name[6:],
@@ -161,14 +140,41 @@ def cmd(command, input=None):
     out = out.decode('utf-8')
     return out,err
 
+def articles():
+    env = wiki.makewiki(wcb.paths["wikiconf"])
+    rm = nshandling.get_redirect_matcher(env.wiki.siteinfo, env.wiki.nshandler)
+
+
+    if os.path.exists(os.path.join(wcb.paths["tmp"], 'articles.list')):
+        logger.info("reading names from " + os.path.join(wcb.paths["tmp"], 'articles.list'))
+        f = codecs.open(os.path.join(wcb.paths["tmp"], 'articles.list'), 'r', 'utf-8')
+        names = [l.strip() for l in f]
+        f.close()
+    else:
+        logger.warn("empty cache, this will take a while")
+        names = [k for k in env.wiki.reader.keys() if env.wiki.nshandler.splitname(k)[0] == nshandling.NS_MAIN]
+        logger.info("writing names to " + os.path.join(wcb.paths["tmp"], 'articles.list'))
+        f = codecs.open(os.path.join(wcb.paths["tmp"], 'articles.list'), 'w', 'utf-8')
+        names_nord = [] #names - redirects
+        for n in names:
+            raw = env.wiki.reader[n]
+            if not rm(raw):
+                f.write(n + '\n')
+                names_nord.append(n)
+        f.close()
+        return names_nord
+
+    return names
+
+
+
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('sections')
     args = parser.parse_args()
-    
+
     sections = unexploded_sections(args.sections)
     for s in sections:
         print '######################'
         print s
-    
