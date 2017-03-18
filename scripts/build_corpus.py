@@ -15,6 +15,7 @@ import traceback
 import re
 import gzip
 import signal
+from timeit import default_timer as timer
 
 import wcb
 from wcb import gml
@@ -151,6 +152,22 @@ def worker(outdir, inqueue, outqueue,
     dirty_client.close()
     outqueue.put(None)  # tell the main process that we are done
 
+def format_seconds(seconds):
+    m, s = divmod(seconds, 60)
+    h, m = divmod(m, 60)
+    d, h = divmod(h, 24)
+    return "%dd:%dh:%02dm:%02ds" % (d, h, m, s)
+
+def log_progress(start_time, total_article_count, article_progress):
+    logger.info("Progress: %.3f%% (article %d of %d)" % ((article_progress / float(total_article_count)) * 100, article_progress, total_article_count))
+    articles_left = total_article_count - article_progress
+    time_elapsed = timer() - start_time
+    time_per_article = time_elapsed / article_progress
+    estimated_time_left = articles_left * time_per_article
+
+    logger.info("Time elapsed: " + format_seconds(time_elapsed))
+    logger.info("Estimated time left: " + format_seconds(estimated_time_left))
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -167,7 +184,6 @@ if __name__ == "__main__":
 
     logger = log.getLogger(__name__)
 
-
     blacklist = []
     if args.blacklist:
         for line in util.file2s(args.blacklist).splitlines():
@@ -175,6 +191,7 @@ if __name__ == "__main__":
             if line:
                 blacklist.append(line)
 
+    logger.info("Getting list of articles from the cache")
     # get a list of article names
     if args.article_list or args.file_list:
         filename = args.article_list if args.article_list else args.file_list
@@ -187,7 +204,8 @@ if __name__ == "__main__":
 
     names.sort()
     articles = [Article(n) for n in names if not n in blacklist]
-
+    article_count = len(articles)
+    logger.info("Parsing a total of " + str(len(articles)) + " articles")
     names = multiprocessing.Queue()
     for e in articles:
         names.put(e)
@@ -207,7 +225,7 @@ if __name__ == "__main__":
     senseg_purifier.extra_newlines = True
 
     ret = multiprocessing.Queue() # the processed articles returned from worker()
-    logger.info("starting workers")
+    logger.info("starting " + str(args.processes or 1) + " workers")
     for i in range(0, args.processes):
         p = multiprocessing.Process(target=worker, name=str(i), args=(args.out_dir, names, ret,
                                                                       order, args.clean_port,
@@ -226,6 +244,7 @@ if __name__ == "__main__":
     articles = [None] * len(articles)
 
     i = 0
+    start_time = timer()
     while curr_pcs > 0:
         article = ret.get()
         if not article:
@@ -233,7 +252,13 @@ if __name__ == "__main__":
         else:
             articles[article.id] = article
 
+            # give an early estimate
+            if i % 100 == 0 and i > 1 and i < 200:
+                log_progress(start_time, article_count, i)
+
             if i % 1000 == 0:
+                if (i > 1):
+                    log_progress(start_time, article_count, i)
                 logger.debug("latest article: " + str(article.id) + " (" + str(ready) + " ready)")
 
             while processed < len(articles) and articles[processed] != None:
