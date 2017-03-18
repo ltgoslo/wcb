@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# encoding=utf8
 # -*- coding: utf-8 -*-
 #
 #
@@ -71,12 +72,12 @@ class Rules:
         for p in params:
            try:
                if p in attrs:
-                   values.append(str(attrs[p]))
+                   values.append(str(attrs[p]).decode('utf-8'))
                else:
-                   values.append(str(getattr(node, p)))
+                   values.append(str(getattr(node, p)).decode('utf-8'))
            except AttributeError:
                pass
-        #log.logger.info(sep + sep.join(values))
+        log.logger.debug(sep + sep.join(values))
         return sep + sep.join(values)
 
     def _get_prop(self, node, prop, default=None):
@@ -154,7 +155,7 @@ def read_rules(rules_file):
                 params.append(r[i])
             i += 1
         rules.parameters[name] = params
-            
+        
     f.close()
     return rules
 
