@@ -159,7 +159,7 @@ def format_seconds(seconds):
     return "%dd:%dh:%02dm:%02ds" % (d, h, m, s)
 
 def log_progress(start_time, total_article_count, article_progress):
-    logger.info("Progress: %.3f%% (article %d of %d)" % ((article_progress / float(total_article_count)) * 100, article_progress, total_article_count))
+    logger.info("Progress: %.3f%% (saved article %d of %d)" % ((article_progress / float(total_article_count)) * 100, article_progress, total_article_count))
     articles_left = total_article_count - article_progress
     time_elapsed = timer() - start_time
     time_per_article = time_elapsed / article_progress
@@ -253,19 +253,18 @@ if __name__ == "__main__":
             articles[article.id] = article
 
             # give an early estimate
-            if i % 100 == 0 and i > 1 and i < 200:
-                log_progress(start_time, article_count, i)
+            if saved % 100 == 0 and saved > 1 and saved < 200:
+                log_progress(start_time, article_count, saved)
 
             if i % 1000 == 0:
-                if (i > 1):
-                    log_progress(start_time, article_count, i)
-                logger.debug("latest article: " + str(article.id) + " (" + str(ready) + " ready)")
+                if (saved > 1):
+                    log_progress(start_time, article_count, saved)
 
-            while processed < len(articles) and articles[processed] != None:
+            while processed < article_count and articles[processed] != None:
                 if articles[processed].gml.strip():
                     # simple sanity check, all articles must have a top level heading
                     if not u'⌊δ' in articles[processed].gml:
-                        logger.error("Missing fist line of " + articles[processed].name)
+                        logger.error("Missing first line of " + articles[processed].name)
                     ready += 1
                 processed += 1
 
