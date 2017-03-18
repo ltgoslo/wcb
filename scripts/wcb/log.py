@@ -14,7 +14,6 @@ def getLogger(module):
     handler.setFormatter(logging.Formatter('[%(asctime)s %(module)s.%(funcName)s()] %(message)s'))
     logger.addHandler(handler)
 
-
     if module in loglevels:
         logger.setLevel(loglevels[module])
     else:
@@ -23,12 +22,14 @@ def getLogger(module):
     return logger
 
 
-DEBUG = False
-
-loglevels = {'unspecified': logging.INFO}
+loglevels = {
+    'unspecified': logging.INFO,
+    '__main__': logging.INFO
+}
 if 'DEBUG' in os.environ:
     for module in os.environ['DEBUG'].split(':'):
         loglevels[module] = logging.DEBUG
+
 if 'INFO' in os.environ:
     for module in os.environ['INFO'].split(':'):
         loglevels[module] = logging.INFO
