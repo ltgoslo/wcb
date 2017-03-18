@@ -1,0 +1,83 @@
+template_action_comment
+__If a template is matched by more than one rule, the first one takes precedence. 
+__This means that the ordering matters and that a single template can be ecxluded from a pattern by being placed over the rule. (See IPA-notice and /^ipa/)
+Flagicon_remove_
+Reflist_remove_
+Main_remove_
+GR_remove_
+Birth date and age_keep_
+BirthDeathAge_keep_
+Birth date_keep_
+Birth year and age_keep_
+Death date_keep_
+Death year and age_keep_
+0_remove_
+Disambig_remove_
+Taxobox_remove_
+Rating-5_keep_
+Citation_remove_
+Goal_keep_
+Episode list_remove_
+Commons_remove_
+Footballbox_remove_
+Portal_remove_
+See also_remove_
+Persondata_remove_
+Height_keep_
+Cquote_keep_
+Ref_remove_
+Nowrap_keep_
+Dablink_remove_
+Age_keep_
+Age in days_keep_
+Age in days nts_keep_
+Age in years and days_keep_
+Click_remove_
+Oscoor_keep_
+Navbox_remove_
+Ambox_remove_
+Fix_remove_
+Asbox_remove_
+Country flagicon2_remove_
+Coor URL_remove_
+US county navigation box_remove_
+Chembox entry_remove_
+IPA notice_remove_/^IPA/ is kept
+Javadoc:EE_keep_
+Javadoc:SE_keep_
+Harvard citation text_keep_
+Harvard citation_keep_
+Harvard citation no brackets_keep_
+Harvard citations_keep_
+Transl_keep_
+Audio_remove_
+CoorOS_remove_
+ThisDateInRecentYears_remove_
+__
+__Strings betwen slashes are considered to be regular expressions, capitalisation is ignored.
+/stub$/_remove_
+/^infobox/_remove_
+/^lang/_keep_
+/county/_remove_
+/^cite/_remove_
+/^pbb/_remove_
+/line$/_remove_
+/^auto/_keep_Auto-stub is removed
+/^expand/_remove_
+/commune/_remove_
+/^ipa/_keep_IPA-notice is removed
+/^politics/_remove_
+/^convert/_keep_
+/^nihongo/_keep_
+/^coor/_keep_
+/calendar/_remove_
+/redirect/_remove_
+See_remove_
+Audio_remove_
+Wiktionary_remove_
+Main_remove_
+Details_remove_
+Listen_remove_
+Selfref_remove_
+PIE_keep_Proto indo-european 
+US patent_keep_

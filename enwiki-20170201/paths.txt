@@ -1,0 +1,15 @@
+#path to the wikiconf created by "mw-buildcdb"
+wikiconf = /path/to/wikiconf.txt
+
+sections = sections.csv
+templaterules = templaterules.csv
+tmp = tmp
+templatecache = tmp/templaterules.csv
+
+clean lm = clean.lm.gz
+dirty lm = dirty.lm.gz
+
+#it should not be necessary to change anything below
+noderules = ../common/noderules.csv
+noderules_senseg = ../common/noderules_senseg.csv
+noderules_gml = ../common/noderules_gml.csv
