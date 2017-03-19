@@ -9,7 +9,8 @@
 import argparse, csv, sys, codecs
 from mwlib import advtree
 import log
-
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 logger = log.getLogger(__name__)
 
@@ -72,12 +73,11 @@ class Rules:
         for p in params:
            try:
                if p in attrs:
-                   values.append(str(attrs[p]).decode('utf-8'))
+                   values.append(str(attrs[p]))
                else:
-                   values.append(str(getattr(node, p)).decode('utf-8'))
+                   values.append(str(getattr(node, p)))
            except AttributeError:
                pass
-        log.logger.debug(sep + sep.join(values))
         return sep + sep.join(values)
 
     def _get_prop(self, node, prop, default=None):
@@ -155,7 +155,7 @@ def read_rules(rules_file):
                 params.append(r[i])
             i += 1
         rules.parameters[name] = params
-        
+
     f.close()
     return rules
 

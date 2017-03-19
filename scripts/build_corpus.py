@@ -162,9 +162,10 @@ def log_progress(start_time, total_article_count, article_progress):
     logger.info("Progress: %.3f%% (saved article %d of %d)" % ((article_progress / float(total_article_count)) * 100, article_progress, total_article_count))
     articles_left = total_article_count - article_progress
     time_elapsed = timer() - start_time
-    time_per_article = time_elapsed / article_progress
+    time_per_article = time_elapsed / float(article_progress)
     estimated_time_left = articles_left * time_per_article
 
+    logger.info("Time per article: %.3fs" % time_per_article)
     logger.info("Time elapsed: " + format_seconds(time_elapsed))
     logger.info("Estimated time left: " + format_seconds(estimated_time_left))
 
@@ -244,21 +245,17 @@ if __name__ == "__main__":
     articles = [None] * len(articles)
 
     i = 0
+    last_estimate = None
     start_time = timer()
+    estimate_bulk_size = 1000
+    write_bulk_size = 100
+
     while curr_pcs > 0:
         article = ret.get()
         if not article:
             curr_pcs -= 1
         else:
             articles[article.id] = article
-
-            # give an early estimate
-            if saved % 100 == 0 and saved > 1 and saved < 200:
-                log_progress(start_time, article_count, saved)
-
-            if i % 1000 == 0:
-                if (saved > 1):
-                    log_progress(start_time, article_count, saved)
 
             while processed < article_count and articles[processed] != None:
                 if articles[processed].gml.strip():
@@ -268,10 +265,13 @@ if __name__ == "__main__":
                     ready += 1
                 processed += 1
 
-                if ready == 100:
+                if ready == write_bulk_size:
                     ready = 0
                     write_segment(args.out_dir, articles[saved:processed])
                     saved = processed
+                    if (not last_estimate or (saved - last_estimate) > estimate_bulk_size):
+                        last_estimate = saved
+                        log_progress(start_time, article_count, saved)
 
         i += 1
     # add the remaining articles to the corpus
