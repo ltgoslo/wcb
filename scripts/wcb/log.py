@@ -7,6 +7,24 @@
 
 import logging
 import os
+import ConfigParser
+import wcb
+
+loglevel_dict = {
+    'WARN': logging.WARN,
+    'INFO': logging.INFO,
+    'DEBUG': logging.DEBUG
+}
+default_log_level = logging.WARN
+
+config_parser = ConfigParser.RawConfigParser()
+config_parser.read(wcb.paths["cfg"])
+
+if (config_parser.get('WCB', 'default_log_level')):
+    default_log_level = loglevel_dict[config_parser.get('WCB', 'default_log_level')]
+
+if (config_parser.has_option('WCB', 'log_directory')):
+    logging.basicConfig(filename=str(config_parser.get('WCB', 'log_directory')) + 'wcb.log')
 
 def getLogger(module):
     logger = logging.getLogger(module)
@@ -17,8 +35,8 @@ def getLogger(module):
     if module in loglevels:
         logger.setLevel(loglevels[module])
     else:
-        logger.setLevel(logging.WARN)
-    
+        logger.setLevel(default_log_level)
+
     return logger
 
 

@@ -8,11 +8,6 @@ import os
 
 from mwlib import nuwiki, wiki
 
-import log
-
-
-logger = log.getLogger(__name__)
-
 # read the config, its location is given by the PATHSFILE enirionment variable
 paths = {}
 def read_paths(filename):
@@ -31,7 +26,7 @@ def read_paths(filename):
 if 'PATHSFILE' in os.environ:
     read_paths(os.environ['PATHSFILE'])
 else:
-    logger.warning("PATHSFILE not set")
+    print("PATHSFILE not set")
 
 
 # cdb is no longer supported by mwlib, we use the third party module mwlib.cdb instead

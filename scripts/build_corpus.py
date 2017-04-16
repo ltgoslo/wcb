@@ -162,13 +162,14 @@ def format_seconds(seconds):
     d, h = divmod(h, 24)
     return "%dd:%dh:%02dm:%02ds" % (d, h, m, s)
 
-def log_progress(start_time, total_article_count, article_progress):
+def log_progress(start_time, total_article_count, article_progress, empty_articles):
     logger.info("Progress: %.3f%% (saved article %d of %d)" % ((article_progress / float(total_article_count)) * 100, article_progress, total_article_count))
     articles_left = total_article_count - article_progress
     time_elapsed = timer() - start_time
     time_per_article = time_elapsed / float(article_progress)
     estimated_time_left = articles_left * time_per_article
 
+    logger.info("Empty articles (probably redirects): %d of %d" % (empty_articles, article_progress))
     logger.info("Time per article: %.3fs" % time_per_article)
     logger.info("Time elapsed: " + format_seconds(time_elapsed))
     logger.info("Estimated time left: " + format_seconds(estimated_time_left))
@@ -245,13 +246,14 @@ if __name__ == "__main__":
     saved = 0  # idx of first non-saved
     processed = 0  # idx of first non-processed
     ready = 0  # entries that can be written to disk
+    empty_articles = 0
 
     articles = [None] * len(articles)
 
     i = 0
     last_estimate = None
     start_time = timer()
-    estimate_bulk_size = 1000
+    estimate_bulk_size = 2500
     write_bulk_size = 100
 
     while curr_pcs > 0:
@@ -268,6 +270,8 @@ if __name__ == "__main__":
                     if not u'⌊δ' in processed_article.gml:
                         logger.error("Missing first line of " + processed_article.name)
                     ready += 1
+                else:
+                    empty_articles += 1
                 processed += 1
 
                 if ready == write_bulk_size:
@@ -276,12 +280,15 @@ if __name__ == "__main__":
                     saved = processed
                     if (not last_estimate or (saved - last_estimate) > estimate_bulk_size):
                         last_estimate = saved
-                        log_progress(start_time, article_count, saved)
+                        log_progress(start_time, article_count, saved, empty_articles)
 
         i += 1
     # add the remaining articles to the corpus
     if saved < len(articles):
         write_segment(args.out_dir, articles[saved:])
+        saved = len(articles)
+    logger.info('Finished parsing')
+    log_progress(start_time, article_count, saved, empty_articles)
     #shut down the n-gram servers
     clean.stop()
     dirty.stop()

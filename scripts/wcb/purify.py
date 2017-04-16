@@ -344,7 +344,7 @@ class Purifier(object):
                 logger.info(title + ' redirects to ' + target)
                 return self.parse_and_purify(target)
             else:
-                logger.info('ignored redirect from ' + title + ' to ' + target)
+                logger.debug('ignored redirect from ' + title + ' to ' + target)
                 return None
 
         else:
