@@ -330,7 +330,12 @@ class Purifier(object):
         parses the named article and returns it as a list of PureSections, returns None for redirects
         """
         title = title.decode('utf-8')
-        raw = self.env.wiki.reader[title]
+        try:
+            raw = self.env.wiki.reader[title]
+        except KeyError as e:
+            logger.error('Unable to find article ' + title)
+            return None
+
 
         #check for redirect
         target = self.rm(raw)
@@ -339,6 +344,7 @@ class Purifier(object):
                 logger.info(title + ' redirects to ' + target)
                 return self.parse_and_purify(target)
             else:
+                logger.info('ignored redirect from ' + title + ' to ' + target)
                 return None
 
         else:

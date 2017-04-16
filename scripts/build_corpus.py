@@ -114,22 +114,26 @@ def worker(outdir, inqueue, outqueue,
                     article.sections = preprocessor.purify_string(w_markup, name)
                 else:
                     article.sections = preprocessor.parse_and_purify(article.name)
-                sections.extend(article.sections)
+                if (article.sections):
+                    sections.extend(article.sections)
             classify.classify(sections, clean_client, dirty_client)
 
             for article in articles:
-                gml.filter_sections(article.sections)
-                for sect in article.sections:
-                    if sect.clean:
-                        text = senseg.senseg(senseg_purifier.node2str(sect.tree))
-                        lines = purify.markup_sentences(gml_purifier, sect, re.split('\n+', text), gml.escape)
-                        article.gml += '\n'.join(lines) + '\n'
-                    elif sect.sprint:
-                        article.gml += gml_purifier.markup_heading(sect) + '\n'
+                if (article.sections):
+                    gml.filter_sections(article.sections)
+                    for sect in article.sections:
+                        if sect.clean:
+                            text = senseg.senseg(senseg_purifier.node2str(sect.tree))
+                            lines = purify.markup_sentences(gml_purifier, sect, re.split('\n+', text), gml.escape)
+                            article.gml += '\n'.join(lines) + '\n'
+                        elif sect.sprint:
+                            article.gml += gml_purifier.markup_heading(sect) + '\n'
 
-                if article.gml:
-                    article.gml = gml.fix_templates(article.gml)
-                article.sections = None
+                    if article.gml:
+                        article.gml = gml.fix_templates(article.gml)
+                    article.sections = None
+                else:
+                    article.gml = None
                 outqueue.put(article)
 
         except Exception as excp:
@@ -258,10 +262,11 @@ if __name__ == "__main__":
             articles[article.id] = article
 
             while processed < article_count and articles[processed] != None:
-                if articles[processed].gml.strip():
+                processed_article = articles[processed]
+                if processed_article.gml and processed_article.gml.strip():
                     # simple sanity check, all articles must have a top level heading
-                    if not u'⌊δ' in articles[processed].gml:
-                        logger.error("Missing first line of " + articles[processed].name)
+                    if not u'⌊δ' in processed_article.gml:
+                        logger.error("Missing first line of " + processed_article.name)
                     ready += 1
                 processed += 1
 
