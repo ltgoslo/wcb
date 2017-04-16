@@ -6,10 +6,16 @@ It is currently being updated and reworked in order to make it more usable for t
 
 [Old documentation](http://moin.delph-in.net/WcbTop)
 
-### Setup
+### Table of Contents
+* [Setup](#setup)
+* [Script invocation](#script-invocation)
+
+## Setup
+
 _to-do, copy from http://moin.delph-in.net/WcbTop_
 
-### Script invocation
+## Script invocation
+
 **- python build\_corpus.py** (builds a corpus for a dump or specified list of articles)
 ```
 usage: build_corpus.py [-h] [--clean-port CLEAN_PORT]
