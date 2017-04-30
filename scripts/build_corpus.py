@@ -253,8 +253,8 @@ if __name__ == "__main__":
     i = 0
     last_estimate = None
     start_time = timer()
-    estimate_bulk_size = 2500
-    write_bulk_size = 100
+    estimate_bulk_size = 15000
+    write_bulk_size = 1000
 
     while curr_pcs > 0:
         article = ret.get()
