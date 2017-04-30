@@ -63,7 +63,7 @@ CategoryLink	purge
 ImageLink	replace	
 LangLink	purge	
 NamedURL	keep	
-NameSpaceLink	keep	
+NameSpaceLink	purge	
 Paragraph	keep	<p>	</p>
 Emphasized	keep	
 Hieroglyphs	replace	

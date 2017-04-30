@@ -52,7 +52,6 @@ def markup_sentences(purifier, puresection, sentences, escape_function=None):
     res = collections.deque([])
 
     puresection.build_tokens()
-    #print repr(puresection.tokens) +  str(id(puresection.tokens))
     rules = purifier.elementrules
 
     token_off = 0
@@ -73,10 +72,10 @@ def markup_sentences(purifier, puresection, sentences, escape_function=None):
         while token_off < len(puresection.tokens):
             t = puresection.tokens[token_off]
 
-
             if skip_until:
                 if isinstance(t, Token) and skip_until == t.node:
                     skip_until = None
+                    continue
 
             elif t:
                 if isinstance(t, basestring):
@@ -85,17 +84,25 @@ def markup_sentences(purifier, puresection, sentences, escape_function=None):
                         token_frag = 0
                         token_off += 1
                         continue
+                    logger.debug('token before nodetext: ' + str(t))
+                    logger.debug('sentence: "' + sentence + '"')
                     nodetext = t[token_frag:]
-                    sentence_frag, node_frag = matchstring(sentence, nodetext)
+                    try:
+                        sentence_frag, node_frag = matchstring(sentence, nodetext)
+                    except AlignmentException:
+                        # Alignment is off, probably because we purged the rest 
+                        # of the sentence and have to break to the next one
+                        markup = u''
+                        token_off += 1
+                        break
                     markup += escape_function(sentence[:sentence_frag])
                     logger.debug('nodetext: "' + nodetext[:node_frag] + '"')
-                    logger.debug('sentence: "' + sentence + '"')
                     sentence = sentence[sentence_frag:]
                     logger.debug('sentence: "' + sentence + '"')
                     if not sentence:
                         closing = True
 
-                    if node_frag == len(nodetext):# and len(nodetext) != len(sentence):
+                    if node_frag == len(nodetext):
                         token_frag = 0
                     else:
                         token_frag += node_frag
@@ -104,11 +111,13 @@ def markup_sentences(purifier, puresection, sentences, escape_function=None):
 
 
                 else:
+                    logger.debug('token: ' + str(t))
                     ac = rules.node_action(t.node)
+                    logger.debug('ac: ' + str(ac))
+                    logger.debug('purge: ' + str(node.PURGE))
                     if t.start and closing and ac != node.REPLACE and ac != node.PURGE:
                         break
 
-                    #print node.action_name(ac)
                     if ac == node.REPLACE:
                         if t.start:
                             markup += rules.node_start(t.node)
@@ -117,16 +126,17 @@ def markup_sentences(purifier, puresection, sentences, escape_function=None):
                     elif ac == node.PURGE:
                         if t.start:
                             skip_until = t.node
+
                     elif ac == node.KEEP:
                         if t.start:
                             markup += rules.node_start(t.node)
                         else:
                             markup += rules.node_params(t.node) + rules.node_end(t.node)
-                    #elif ac == node.REMOVE: pass
 
             token_off += 1
 
-        res.append(markup.replace('\n', ' ').strip())
+        if markup:
+            res.append(markup.replace('\n', ' ').strip())
 
     markup = u''
     while token_off < len(puresection.tokens):

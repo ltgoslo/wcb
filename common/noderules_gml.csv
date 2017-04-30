@@ -66,7 +66,7 @@ CategoryLink	purge
 ImageLink	replace	⌊✎⌋
 LangLink	purge	
 NamedURL	keep	⌊>	>⌋
-NameSpaceLink	keep	⌊>	>⌋
+NameSpaceLink	purge
 Paragraph	keep	<______>	___NL___
 Emphasized	keep	⌊/	/⌋
 Hieroglyphs	purge	
