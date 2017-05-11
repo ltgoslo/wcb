@@ -24,9 +24,13 @@ usage: build_corpus.py [-h] [--clean-port CLEAN_PORT]
                        [--article-list ARTICLE_LIST | --file-list FILE_LIST]
                        out_dir
 ```
-**- python getMarkup.py** (gets the markup of an article)
+**- python getMarkup.py** (gets the raw markup of an article)
 ```
 usage: getMarkup.py [-h] article
 
 ```
-**- python list\_articles.py** (lists article names)
+**- python list\_articles.py** (lists article names)  
+
+**-python printNodes.py** (Prints the syntax tree of an article)  
+*Not Working due to an exception in nuwiki*
+
