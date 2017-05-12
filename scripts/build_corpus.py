@@ -169,7 +169,7 @@ def log_progress(start_time, total_article_count, article_progress, empty_articl
     time_per_article = time_elapsed / float(article_progress)
     estimated_time_left = articles_left * time_per_article
 
-    logger.info("Empty articles (probably redirects): %d of %d" % (empty_articles, article_progress))
+    logger.info("Empty articles (probably redirects): %d of %d (%.2f%%)" % (empty_articles, article_progress, (empty_articles / float(article_progress)) * 100))
     logger.info("Time per article: %.3fs" % time_per_article)
     logger.info("Time elapsed: " + format_seconds(time_elapsed))
     logger.info("Estimated time left: " + format_seconds(estimated_time_left))

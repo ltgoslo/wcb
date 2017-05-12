@@ -9,6 +9,7 @@ import logging
 import os
 import ConfigParser
 import wcb
+import datetime
 
 loglevel_dict = {
     'WARN': logging.WARN,
@@ -20,11 +21,20 @@ default_log_level = logging.WARN
 config_parser = ConfigParser.RawConfigParser()
 config_parser.read(wcb.paths["cfg"])
 
+def get_logfilename(filename):
+    return str(config_parser.get('WCB', 'log_directory')) + filename + '.log'
+
 if (config_parser.get('WCB', 'default_log_level')):
     default_log_level = loglevel_dict[config_parser.get('WCB', 'default_log_level')]
 
 if (config_parser.has_option('WCB', 'log_directory')):
-    logging.basicConfig(filename=str(config_parser.get('WCB', 'log_directory')) + 'wcb.log')
+    basename = 'wcb'
+    i = 1
+    filepath = get_logfilename(basename)
+    while os.path.isfile(filepath):
+        filepath = get_logfilename(basename + '-' + str(i))
+        i += 1
+    logging.basicConfig(filename=filepath, format='[%(asctime)s %(module)s.%(funcName)s()] %(message)s')
 
 def getLogger(module):
     logger = logging.getLogger(module)
