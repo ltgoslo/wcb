@@ -1,0 +1,72 @@
+### test-battery for a German (latin-1)
+###  * tokenizer
+###  * sentence segmenter
+
+
+### testing re-combining of hyphenated words (option -c):
+Ein ge-
+trenn-
+tes Wort;
+hier eins mit Leer-  
+zeichen hinter dem Trennstrich am Zeilenende. 
+
+### but some hyphenated words keep the hyphen (e.g. ABC-Waffen)
+Hier wieder ein paar Trennungen aber mit Bindestrichwörtern eingestreut: rot-
+grüne Koalisations-
+ver-
+ein-
+barungen bzgl. Gesetzes-
+initiativen der EU-
+Kommission.
+ABC-Waffen sind Bindestrichwörter und als solche nur ein Token. Am Zeilenende (z.B. GAT-
+Abkommen) sind sie aber kaum als solche zu erkennen. Leer- 
+und Kranken-
+stände sind ebenso problematisch, wie die Lach-
+und Schießgesellschaft. 
+
+### soft-hyphen (U+00AD)
+Hier ein Soft­hyphen.
+
+### non-breaking spaces (U+00A0)
+Ein Satz mit Non-Breaking-Spaces.
+
+### URLs and email-adresses:
+URLs und Email-Adressen sollten als ein Token behandelt werden:
+(http://www.daehne.de,
+http://www.messe.de/cb98/prog/t22/980324_d.html,
+http://rzaix340.rz.uni-leipzig.de/~wir95hji/hindex.htm bzw.
+ultrasde@hotmail.com)
+
+
+### tests for end-of-sentence detection
+Satz. Dort? Hier! 
+19. August 1972. 12.8.1983. 12. 8. 1983. 12. viii. 1993. 
+Er sprach: "Ein Satz in Anführungszeichen." (Und in Klammern.) (Bzw. a - (b + c).)
+Z.B. Herr Müller, Dr. Max Hadersbeck, Hr. Schäfer,
+Prof. Dr. med. em. F. Schulz,
+Prof. Guenthner. Mr. G. W. Spencer schläft. Hier beginnt ein Satz.
+Die Römer eroberten im Jahre 83 n. Chr. Regensburg, was nicht stimmt.
+
+### but sometimes an abbreviation point is an EOS-point, too:
+Die Römer eroberten Regensburg im Jahre 83 n. Chr. Und hier beginnt ein Satz.
+Das Buch kostet 87 DM inkl. Damit ist es teuer.
+In der Oettingenstr. 67 stehen Computer etc. In der Kaiser-Friedrich-Str. 100 nicht. 
+### typical and frequent words which are indicators for a begin-of-sentence are:
+### capitalized articles, prepositions and conjunctions, etc. not homonymous to proper nouns
+
+### short inserts in parenthesis are/should not treated as separate sentences
+Ein Satz mit einem (Das ist ein dt. Einschub.) Einschub in runden Klammern.
+
+### there are various options how paragraphs should be handled
+###  * as indicators for EOS (-n and -N)
+###  * and in output (-p)
+
+Das ist ein Absatz.
+
+Das nicht.
+Oder zumindest nicht allein.
+
+Eine Überschrift ohne Punkt
+Roman von Sebastian Nagel
+
+Es war einmal ein Tokenizer. 

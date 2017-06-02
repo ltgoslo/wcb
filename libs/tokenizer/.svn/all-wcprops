@@ -1,0 +1,305 @@
+K 25
+svn:wc:ra_dav:version-url
+V 35
+/!svn/ver/16422/trunk/cis/tokenizer
+END
+configure
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/!svn/ver/16422/trunk/cis/tokenizer/configure
+END
+TokenizeEnU8.l
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizeEnU8.l
+END
+Makefile.in
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/!svn/ver/16422/trunk/cis/tokenizer/Makefile.in
+END
+depcomp
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/!svn/ver/16422/trunk/cis/tokenizer/depcomp
+END
+TokenizeRu.l
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizeRu.l
+END
+TokenizeEnL1.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizeEnL1.c
+END
+TokenizeRuWin.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizeRuWin.c
+END
+TokenizeDeU8.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizeDeU8.c
+END
+Tokenizer.h
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/!svn/ver/16422/trunk/cis/tokenizer/Tokenizer.h
+END
+TokenizeEnL1.l
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizeEnL1.l
+END
+TokenizerLang.h
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizerLang.h
+END
+configure.ac
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/!svn/ver/16422/trunk/cis/tokenizer/configure.ac
+END
+TokenizeEn.l
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizeEn.l
+END
+INSTALL
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/!svn/ver/16422/trunk/cis/tokenizer/INSTALL
+END
+TokenizeRuWin.l
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizeRuWin.l
+END
+TokenizeDeU8.l
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizeDeU8.l
+END
+COPYING
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/!svn/ver/16422/trunk/cis/tokenizer/COPYING
+END
+putzer.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/!svn/ver/16422/trunk/cis/tokenizer/putzer.c
+END
+TokenizeEnWin.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizeEnWin.c
+END
+htmlEnt2Char.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/!svn/ver/16422/trunk/cis/tokenizer/htmlEnt2Char.c
+END
+TokenizeRuI5.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizeRuI5.c
+END
+TokenizeDeL1.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizeDeL1.c
+END
+LC_cp1251.h
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/!svn/ver/16422/trunk/cis/tokenizer/LC_cp1251.h
+END
+mkinstalldirs
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/!svn/ver/16422/trunk/cis/tokenizer/mkinstalldirs
+END
+LC_cp1252.h
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/!svn/ver/16422/trunk/cis/tokenizer/LC_cp1252.h
+END
+putzer.l
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/!svn/ver/16422/trunk/cis/tokenizer/putzer.l
+END
+TokenizeEnWin.l
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizeEnWin.l
+END
+htmlEnt2Char.l
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/!svn/ver/16422/trunk/cis/tokenizer/htmlEnt2Char.l
+END
+torture_de_l1.txt
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/!svn/ver/16422/trunk/cis/tokenizer/torture_de_l1.txt
+END
+TokenizeRuI5.l
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizeRuI5.l
+END
+TokenizeDeL1.l
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizeDeL1.l
+END
+TokenizeDe.l
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizeDe.l
+END
+tokenizer.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/!svn/ver/16422/trunk/cis/tokenizer/tokenizer.c
+END
+LC_ascii.h
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/!svn/ver/16422/trunk/cis/tokenizer/LC_ascii.h
+END
+TokenizeRuU8.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizeRuU8.c
+END
+LIESMICH
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/!svn/ver/16422/trunk/cis/tokenizer/LIESMICH
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/!svn/ver/16422/trunk/cis/tokenizer/README
+END
+TokenizeDeWin.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizeDeWin.c
+END
+TokenizerLexer.h
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizerLexer.h
+END
+config.h.in
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/!svn/ver/16422/trunk/cis/tokenizer/config.h.in
+END
+TokenizeRuU8.l
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizeRuU8.l
+END
+LC_ISOlatin1.h
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/!svn/ver/16422/trunk/cis/tokenizer/LC_ISOlatin1.h
+END
+TokenizeEnU8.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizeEnU8.c
+END
+TokenizeDeWin.l
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/!svn/ver/16422/trunk/cis/tokenizer/TokenizeDeWin.l
+END
+Makefile.am
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/!svn/ver/16422/trunk/cis/tokenizer/Makefile.am
+END
+missing
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/!svn/ver/16422/trunk/cis/tokenizer/missing
+END
+aclocal.m4
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/!svn/ver/16422/trunk/cis/tokenizer/aclocal.m4
+END
+LC_ISOcyrillic5.h
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/!svn/ver/16422/trunk/cis/tokenizer/LC_ISOcyrillic5.h
+END
+install-sh
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/!svn/ver/16422/trunk/cis/tokenizer/install-sh
+END
+ylwrap
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/!svn/ver/16422/trunk/cis/tokenizer/ylwrap
+END

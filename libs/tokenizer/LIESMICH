@@ -1,0 +1,128 @@
+
+tokenizer, putzer, htmlEnt2Char -- drei Tools zur Korpusbearbeitung
+===================================================================
+
+tokenizer    -- ein Tokenizer mit Satzenderkennung (Optionen siehe "tokenizer -h")
+
+
+putzer       -- entfernt aus dem Text überflüssige Leerzeichen, Trennstriche
+                (Optionen siehe "putzer -h")
+
+htmlEnt2Char -- konvertiert HTML-Entities in Text (Optionen siehe "htmlEnt2Char -h")
+
+
+
+Kompilierung und Installation (siehe auch Datei INSTALL):
+ ./configure
+ make && make install
+
+
+
+Alle drei Tools sind Weiterentwicklungen von Hausaufgaben im Kurs
+"Programmentwicklung in C" bei Max Hadersbeck. 
+
+
+
+Zum "tokenizer":
+
+Ziel war einen Tokenizer mit Satzenderkennung zu schreiben, der
+schnell und universell ist, d.h. nicht abhängig von Trainingsdaten,
+einer bestimmten Textsorte, aber nicht 100% perfekt.
+
+Derzeit unterstützte Sprachen: Deutsch, Englisch und Russisch,
+jeweils in ISO- und Windows-Codepage und UTF-8.
+
+Die Teilprobleme und -aufgaben hier nur kurz skizziert:
+
+1. Anpassung durch Optionen auf bestimmte Texteigenheiten:
+ - Sprache und Zeichensatz
+ - Worttrennung
+ - Bedeutung des Zeilenumbruchs
+
+2. Probleme und Strategien der Tokenisierung:
+ - Bindestrichwörter: werden als ein Token behandelt
+ - Worttrennungen über Zeilengrenzen: werden (mit Option -c) konkateniert.
+   Dabei kommt es zwangsweise zu Fehlern, falls Bindestrichwörter von
+   der Trennung über die Zeilengrenze betroffen sind. Ausnahmelexika
+   würden den Tokenizer zu groß machen; die Option -c ist deshalb mit
+   Vorsicht zu wählen.
+
+3. Satzenderkennung:
+ - Problem prinzipiell nicht lösbar ohne Lexikon
+ - Affinität zum Tagging (-> Mikheev "Tagging sentence boundaries")
+ - Methoden, die Kenntnis des ganzen Textes voraussetzen, nicht praktikabel
+ - hier wurde ein regulärer Ansatz gewählt, d.h. nur der nächste Kontext
+   einer möglichen Satzendeinterpunktion wird in Betracht gezogen
+ - Pfade die Satzendemarkierung enthalten vs.
+ - Alternativpfade (Datum, Abkürzungen etc.)
+ - Besondere Sorgfalt in Abkürzungsliste: nur Abkürzungen,
+   die häufig nicht am Satzende stehen (also nicht "usw.", "etc.")
+ - Besonderheit im Deutschen: da Nomina großgeschrieben werden, ist es sinnlos
+   (ohne Lexikon), das auf die Interpunktion folgende großgeschriebene
+   Wort mit in Betracht zu ziehen (<-> Mikheev "Periods, capitalized words, etc.",
+   mit Fallunterscheidung ob folgendes Wort Eigenname oder nicht)
+ - Allerdings sind z.B. ein großgeschriebener Artikel, Konjunktion oder Präposition
+   ein starkes Indiz für einen Satzanfang. Damit lassen sich Satzenden auch dann
+   erkennen, wenn der Satzendepunkt gleichzeitig Abkürzungspunkt ist.
+
+4. Die Optionen teilen sich in zwei Gruppen:
+ - Optionen, die vom Input abhängig sind: -L, -c, -C, -n, -N
+   Diese sollten sehr sorgfältig gewählt werden
+ - Optionen, die den Output betreffen: -S, -p, -P, -s, -W, -l, ...
+
+5. Groß/Klein-Konvertierung
+ - als praktische Ergänzung hinzugefügt, mit Tabelle für jeweilige
+   Sprache und Zeichensatz
+
+
+Für das Deutsche ist eine Datei "torture_de_l1.txt" beigefügt, die die
+oben besprochenen Probleme enthält. 
+
+Tests mit annotierten Korpora (Brown, SZ) haben eine Fehlerrate der Satzenderkennung
+von etwa 3% ergeben. 
+
+
+Version history:
+
+0.1 -- package with tokenizer, putzer, htmlEnt2Char
+
+0.2 -- bug reported by js: when input contains long words or many following newlines
+       tokenizer stops with "input buffer overflow". To avoid this use putzer as
+       filter with newly introduced option -m!
+
+0.3 -- optimization (inlines & macros): now about 10% faster
+
+0.4 -- corrected some details in German EOS-detection, changed behaviour with option -sx:
+       When a newline is recognized a space is printed on a separate line,
+       instead of an empty line.
+
+0.5 -- ':' now not considered as EOS-mark. Additions to German abbreviation list.
+
+0.6 -- Added more German abbreviations, Roman numerals with point.
+       Added rudimentary support for utf-8 in German.
+
+0.7 -- Better EOS for English, thanks to Michaela Geierhos;
+       rudimentary support for utf-8 in English
+
+0.8 -- fixed a bug in the Russian part, which makes the tokenizer hanging
+
+0.9 -- changes to German abbreviations
+       rudimentary support for utf-8 in Russian
+
+0.10 -- fixed bug raising a segfault for German language option
+        short sequences in parenthesis are excluded from containit an end-of-sentence
+        additions to German abbreviations
+
+0.11 -- fixed a bug with options -C and -c.
+        Introduced positive rules for German EOS : i.e. if a capitalized article, conjunction
+        or prepositions follows an abbreviation or date, there should be an EOS.
+
+0.12 -- better documentation (in English)
+        Positive rules also for English: The text «The firm said it
+        plans to sublease its current headquarters at 55 Water St. A
+        spokesman declined to elaborate.» (Wall Street Journal) is now
+        correctely splitted into two sentences
+
+1.0  -- (almost) no changes
+        GPL licensed now
+
