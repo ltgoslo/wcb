@@ -68,20 +68,39 @@ The project comes with pre-configuration for the following snapshots.
 1. Downlad the snapshot
 2. Decompress: `bunzip enwiki-SNAPSHOT-pages-articles.xml.bz2`
 3. Create a constant database: `mw-buildcdb --input enwiki-SNAPSHOT-pages-articles.xml --output OUTDIR`
-4. Most of the WCB modules need access to a paths configuration file. They determine its location by examining the `PATHSFILE` environment variable, set it like so: `export PATHSFILE=./wcb/enwiki-SNAPSHOT/paths.txt` (in your ~/.bash_profile for persistence).
-
-To test the configuration, try running ...
-
+4. Change the `wikiconf` entry in `/wcb/enwiki-SNAPSOT/paths.txt` to point to the `wikiconf.txt` file generated in the previous step.
+5. The WCB modules in this project need access to the `paths.txt` configuration file. They determine its location by examining the `PATHSFILE` environment variable, set it like so: `export PATHSFILE=./wcb/enwiki-SNAPSHOT/paths.txt` (in your ~/.bash_profile for persistence).
 
 #### Configuring a new dump
-*In progress...*
+1. Downlad the snapshot
+2. Decompress: `bunzip enwiki-SNAPSHOT-pages-articles.xml.bz2`
+3. Create a constant database: `mw-buildcdb --input enwiki-SNAPSHOT-pages-articles.xml --output OUTDIR`
+4. Now you have to add configuration for a new snapshot. Copy the `enwiki-20170201` directory to a new directory reflecting your snapshot's date.
+5. Change the `wikiconf` entry in `/wcb/enwiki-SNAPSOT/paths.txt` to point to the `wikiconf.txt` file generated in step 3.
+6. The WCB modules in this project need access to the `paths.txt` configuration file. They determine its location by examining the `PATHSFILE` environment variable, set it like so: `export PATHSFILE=./wcb/enwiki-SNAPSHOT/paths.txt` (in your ~/.bash_profile for persistence).
+
+#### Test run
+To test the configuration, try running the corpus builder on the list of test articles, like so:
+
+```
+mkdir test-dir
+./wcb/scripts/build_corpus.py --articles-list /wcb/test-articles.txt test-dir
+```
+
+The first invocation of this command will take some time as it will examine all the templates in the snapshot.
+
+#### Full run
+```
+mkdir out-dir
+./wcb/scripts/build_corpus.py -p NUMBER_OF_PROCESSES out-dir
+```
 
 #### Adding support for additional languages
 *In progress...*
 
 ## Script invocation
 
-**- python build\_corpus.py** (builds a corpus for a dump or specified list of articles)
+**- python build\_corpus.py** (builds a corpus for a complete dump or specified list of articles)
 ```
 usage: build_corpus.py [-h] [--clean-port CLEAN_PORT]
                        [--dirty-port DIRTY_PORT] [--processes PROCESSES]
