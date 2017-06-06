@@ -91,10 +91,17 @@ To test the configuration, try running the corpus builder on the list of test ar
 
 ```
 mkdir test-dir
-python /wcb/scripts/build_corpus.py --articles-list /wcb/test-articles.txt test-dir
+python /wcb/scripts/build_corpus.py --article-list /wcb/test-articles.txt test-dir
+
+> OUTPUT:
+[2017-06-06 21:40:49,360 build_corpus.log_progress()] Progress: 100.000% (saved article 3 of 3)
+[2017-06-06 21:40:49,360 build_corpus.log_progress()] Empty articles (probably redirects): 2 of 3 (66.67%)
+[2017-06-06 21:40:49,360 build_corpus.log_progress()] Time per article: 0.534s
+[2017-06-06 21:40:49,360 build_corpus.log_progress()] Time elapsed: 0d:0h:00m:01s
+[2017-06-06 21:40:49,360 build_corpus.log_progress()] Estimated time left: 0d:0h:00m:00s
 ```
 
-The first invocation of this command will take some time as it will examine all the templates in the snapshot.
+The first invocation of this command will take some time as it will examine all the templates in the snapshot. On completion, you should see the compressed parsed test run in `test-dir` (which only includes Alberto Masi as the other articles are redirects).
 
 #### Full run
 ```
