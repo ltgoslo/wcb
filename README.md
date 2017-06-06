@@ -65,30 +65,33 @@ If the command `python -c 'from mwlib.cdb import cdbwiki'` does not give any err
 
 ## Running on the English Wikipedia
 The project comes with pre-configuration for the following snapshots. 
+
+**NB: the snapshots aren't hosted by wikimedia anymore, so you will have to [configure a new snapshot](#configuring-a-new-dump) until we are able to host the snapshots somewhere.**
+
 - [2008-07-27](missing-link)
 - [2017-02-01 (57GB)](missing-link)
 
 #### Using a pre-configured snapshot
 1. Downlad the snapshot
-2. Decompress: `bunzip enwiki-SNAPSHOT-pages-articles.xml.bz2`
-3. Create a constant database: `mw-buildcdb --input enwiki-SNAPSHOT-pages-articles.xml --output OUTDIR`
-4. Change the `wikiconf` entry in `/wcb/enwiki-SNAPSOT/paths.txt` to point to the `wikiconf.txt` file generated in the previous step.
-5. The WCB modules in this project need access to the `paths.txt` configuration file. They determine its location by examining the `PATHSFILE` environment variable, set it like so: `export PATHSFILE=./wcb/enwiki-SNAPSHOT/paths.txt` (in your ~/.bash_profile for persistence).
+2. Decompress: `bunzip enwiki-SNAPSHOT_DATE-pages-articles.xml.bz2`
+3. Create a constant database: `mw-buildcdb --input enwiki-SNAPSHOT_DATE-pages-articles.xml --output OUTDIR`
+4. Change the `wikiconf` entry in `/wcb/enwiki-SNAPSHOT_DATE/paths.txt` to point to the `wikiconf.txt` file generated in the previous step.
+5. The WCB modules in this project need access to the `paths.txt` configuration file. They determine its location by examining the `PATHSFILE` environment variable, set it like so: `export PATHSFILE=/wcb/enwiki-SNAPSHOT_DATE/paths.txt` (in your ~/.bash_profile for persistence).
 
 #### Configuring a new dump
-1. Downlad the snapshot
-2. Decompress: `bunzip enwiki-SNAPSHOT-pages-articles.xml.bz2`
-3. Create a constant database: `mw-buildcdb --input enwiki-SNAPSHOT-pages-articles.xml --output OUTDIR`
-4. Now you have to add configuration for a new snapshot. Copy the `enwiki-20170201` directory to a new directory reflecting your snapshot's date.
-5. Change the `wikiconf` entry in `/wcb/enwiki-SNAPSOT/paths.txt` to point to the `wikiconf.txt` file generated in step 3.
-6. The WCB modules in this project need access to the `paths.txt` configuration file. They determine its location by examining the `PATHSFILE` environment variable, set it like so: `export PATHSFILE=./wcb/enwiki-SNAPSHOT/paths.txt` (in your ~/.bash_profile for persistence).
+1. Choose and [downlad a recent snapshot from WikiMedia](https://dumps.wikimedia.org/enwiki/), look for the `enwiki-SNAPSHOT_DATE-pages-articles.xml.bz2` file.
+2. Decompress: `bunzip enwiki-SNAPSHOT_DATE-pages-articles.xml.bz2`
+3. Create a constant database: `mw-buildcdb --input enwiki-SNAPSHOT_DATE-pages-articles.xml --output OUTDIR`
+4. Now you have to add configuration for a new snapshot. Copy the `enwiki-20170201` directory in the repo to a new directory reflecting your snapshot's date.
+5. Change the `wikiconf` entry in `/wcb/enwiki-SNAPSHOT_DATE/paths.txt` to point to the `wikiconf.txt` file generated in step 3.
+6. The WCB modules in this project need access to the `paths.txt` configuration file. They determine its location by examining the `PATHSFILE` environment variable, set it like so: `export PATHSFILE=/wcb/enwiki-SNAPSHOT/paths.txt` (in your ~/.bash_profile for persistence).
 
 #### Test run
 To test the configuration, try running the corpus builder on the list of test articles, like so:
 
 ```
 mkdir test-dir
-./wcb/scripts/build_corpus.py --articles-list /wcb/test-articles.txt test-dir
+python /wcb/scripts/build_corpus.py --articles-list /wcb/test-articles.txt test-dir
 ```
 
 The first invocation of this command will take some time as it will examine all the templates in the snapshot.
@@ -96,7 +99,7 @@ The first invocation of this command will take some time as it will examine all 
 #### Full run
 ```
 mkdir out-dir
-./wcb/scripts/build_corpus.py -p NUMBER_OF_PROCESSES out-dir
+python /wcb/scripts/build_corpus.py -p NUMBER_OF_PROCESSES out-dir
 ```
 
 #### Adding support for additional languages
