@@ -11,7 +11,11 @@ It is currently being updated and reworked in order to make it more usable for t
 * * [Dependencies](#dependencies)
 * * [Known issues](#known-issues)
 * [Running on the English Wikipedia](#running-on-the-english-wikipedia)
-* [Script invocation](#script-invocation)
+* * [Using a pre-configured snapshot](#using-a-pre-configured-snapshot)
+* * [Configuring a new dump](#configuring-a-new-dump)
+* * [Test run](#test-run)
+* * [Full run](#full-run)
+* [Additional script invocations](#script-invocation)
 
 ## Setup
 
